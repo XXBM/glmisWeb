@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<body>
+<script type="text/javascript" src="../static/isFile/index.js" th:src="@{/jsFile/myKY.js}"></script>
+<div>
+    <!--这个table不起作用，只是为了让其他datagrid正常显示-->
+    <div class="easyui-dialog" closed="true">
+        <table id="noUse" class="easyui-datagrid"/>
+    </div>
+    <div>
+        <div id="myky" class="easyui-tabs" style="height:550px" fit="true">
+            <div title="论文">
+                <!--thesis的Datagrid-->
+                <table id="ThesisTable" class="easyui-datagrid" data-options="nowrap:false,rownumbers:true"/>
+            </div>
+            <div title="获奖">
+                <!--award的Datagrid-->
+                <table id="AwardTable" class="easyui-datagrid" data-options="nowrap:false,rownumbers:true"/>
+            </div>
+            <div title="专著">
+                <!--monograph的Datagrid-->
+                <table id="MonographTable" class="easyui-datagrid" data-options="nowrap:false,rownumbers:true"/>
+            </div>
+            <div title="教材" id="textBook_div">
+                <!--textBook的Datagrid-->
+                <table id="TextBookTable" class="easyui-datagrid" data-options="nowrap:false,rownumbers:true"/>
+            </div>
+            <div title="横向的项目" id="projectFundedByPrivateSector_div">
+                <!--projectFoundedByPrivateSector的Datagrid-->
+                <table id="PrivateSectorProjectTable" class="easyui-datagrid" data-options="nowrap:false,rownumbers:true"/>
+            </div>
+            <div title="纵向的项目" id="projectFundedByGovernment_div">
+                <!--projectFoundedByGovernment的Datagrid
+                    nowrap:false  多行显示
+                    列内容多时自动折至下一行,对于英文字母、数字以及英文字符无效只识别汉字-->
+                <table id="GovernmentProjectTable" class="easyui-datagrid" data-options="nowrap:false,rownumbers:true"/>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

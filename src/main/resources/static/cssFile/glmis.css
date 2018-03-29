@@ -1,0 +1,22 @@
+
+/*重写部分easyui.css*/
+.validatebox-invalid,
+.textbox-invalid{
+    background-color:mintcream;/*淡薄荷色*/
+}
+.accordion .accordion-header{
+    background: #F4F4F4;
+}
+.accordion .accordion-body{
+    background: #F4F4F4;
+}
+
+/*自定义css格式*/
+#staffs{
+    float:left;
+    width:300px;
+}
+#information{
+    float:left;
+    padding-left:2px;
+}

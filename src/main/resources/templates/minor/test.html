@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>主页</title>
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css"/>
+    <style type="text/css">a{text-decoration:none}</style>
+</head>
+<body>
+<p style="font-family: '宋体';font-size:50px;font-weight: bold;text-align: center">辅修系统</p>
+<span style="font-family: '宋体';font-size:30px;font-weight: bold;padding-left:28%;padding-right:30%">管理员</span>
+<span style="font-family: '宋体';font-size:30px;font-weight: bold;">学生</span>
+<table style="width:90%">
+    <tr><td style="font-family: '宋体';font-size:20px;font-weight: bold;padding-left:30%">
+        <ul><li><a href="TRegistration.html">报名明细</a></li>
+            <li><a href="TProfessional.html">基础信息维护>专业</a></li>
+            <li><a href="TClass.html">基础信息维护>班级</a></li>
+            <li><a href="Tteach.html">教学计划维护</a></li>
+
+        </ul>
+    </td>
+    <td style="font-family: '宋体';font-size:20px;font-weight: bold;">
+        <ul><li id="a"><a href="login.html">注册</a></li>
+        <li><a href="perfect.html">完善个人信息</a></li>
+        <li><a href="applicant.html">在线报名</a></li>
+        <li><a href="course.html">查看课表/支付学费</a></li>
+
+    </ul></td>
+    </tr>
+</table>
+<div class="easyui-window" id="b" title="学生注册" style="width:400px;padding:30px 60px;font-family:宋体 ;font-size:15px" data-options="closed:true">
+    <div style="margin-bottom:20px">
+        <div>学号:</div>
+        <input class="easyui-textbox" style="width:100%;height:30px">
+    </div>
+    <div style="margin-bottom:20px">
+        <div>密码:</div>
+        <input class="easyui-textbox" style="width:100%;height:30px">
+    </div>
+    <div style="margin-bottom:20px">
+        <div>确认密码:</div>
+        <input class="easyui-textbox" style="width:100%;height:30px">
+    </div>
+    <div><input type="submit" value="提交" style="margin-right:50px;margin-left:70px;height :30px;width:40px">
+        <input type="submit" value="取消"  style="height :30px;width:40px"></div>
+</div>
+</body>
+<script>
+
+    $(document).ready(function() {
+        $("#a").click(function () {
+            $('#b').window('open');
+        });
+    });
+</script>
+</html>

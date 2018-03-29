@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>管理工程学院综合信息管理平台</title>
+    <script type="text/javascript" src="../static/easyui/jquery.min.js" th:src="@{easyui/jquery.min.js}"></script>
+    <script type="text/javascript" src="../static/easyui/jquery.easyui.min.js" th:src="@{easyui/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" src="../static/easyui/locale/easyui-lang-zh_CN.js" th:src="@{easyui/locale/easyui-lang-zh_CN.js}"></script>
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/default/easyui.css" th:href="@{easyui/themes/default/easyui.css}"/>
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/icon.css" th:href="@{easyui/themes/icon.css}"/>
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/color.css"  th:href="@{easyui/themes/color.css}"/>
+    <style type="text/css" >
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+        .form-group{
+            font-family: 新宋体;
+            color:white;
+            margin-bottom: 5px;
+        }
+        .header {
+            background: url("img.png");
+            background-size:100% 100%;
+            width: 90%;
+            height: 130px;
+        }
+        .content {
+            background: url("img2.jpg") no-repeat 0 0;
+            background-size:100% 100%;
+            margin:0px auto;
+            width: 90%;
+            height:500px;
+        }
+        .contentForm{
+            float:right;
+            margin-right: 20px;
+        }
+    </style>
+    <script type="text/javascript">
+        function basePath(){
+            var curWwwPath = window.document.location.href;
+            var pathName =  window.document.location.pathname;
+            var pos = curWwwPath.indexOf(pathName);
+            var localhostPaht = curWwwPath.substring(0,pos);
+            var projectName = pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+            return (localhostPaht + projectName);
+        }
+
+        $(function(){
+            $("#submit").click(function(){
+                //验证码框的输入内容
+                //$.trim去掉字符串首尾空格
+                var checkCode=$.trim($("#veritionCode").val());
+                //获取info登陆正确错误信息
+                var info = $("#info");
+                if(checkCode==''){
+//                    info.html("验证码不能为空");
+//                    $("#veritionCode").focus();
+//                    return false;
+                    $(this).submit();
+                }else{
+                    $(this).submit();
+                }
+            });
+            //     验证码
+            $("#checkImage").click(function(){
+                changCode();
+            });
+            //prop设置或返回指定属性propertyName的值。
+            // 如果指定了value参数，则表示设置属性propertyName的值为value；
+            // 如果没有指定value参数，则表示返回属性propertyName的值。
+            //fadeIn()逐渐改变被选元素的不透明度，从隐藏到可见（褪色效果）,淡出
+            //event.cancelBubble = true;可以停止事件继续上传，取消事件处理
+        })
+        function changCode(){
+            var img = document.getElementById('checkImage');
+            img.src=basePath()+'/kaptcha/getKaptchaImage?nowT='+new Date().getTime();
+            checkImage.hide();
+            event.cancelBubble = true;
+        }
+    </script>
+</head>
+<body>
+<div class="can">
+    <center>
+        <div class="header">
+        </div>
+    </center>
+    <div class="content">
+        <br/><br/><br/><br/>
+        <p style="font-family:楷体;font-size:80px;text-align:center;color:orange">综合信息管理平台</p>
+        <br/><br/>
+        <div class="contentForm">
+            <form th:action="@{/login}" th:method="post">
+                <font id="info" size="3" color="red">
+                    <div th:if="${param.error}">
+                        用户名或密码错误！
+                    </div>
+                </font>
+                <!--required 属性规定必需在提交之前填写输入字段。autofocus输入字段在页面加载时自动获得焦点
+                placeholder 属性提供可描述输入字段预期值的提示信息-->
+                <div class="form-group">
+                    <label for="username">用户名：</label>
+                    <input style="width:130px" id="username" name="username"  type="text"
+                           placeholder="请输入你的用户名" required="required" autofocus="autofocus"/>
+                </div>
+                <div class="form-group">
+                    <label for="password">密&nbsp;码：</label>
+                    <input style="width:130px" type="password" id="password" name="password"
+                           placeholder="请输入你的密码" required="required"/>
+                </div>
+                <div class="form-group">
+                    <div class="code">
+                        <label for="password">验证码：</label>
+                        <input style="width:130px" name="verifitcaionCode"
+                               id="veritionCode" maxlength="4" autocomplete="off"/>
+                    </div>
+                    <div class="code">
+                        <img style="width:80px;height:30px;margin-top:5px;margin-right: 10px;margin-left: 30px" alt="验证码" id="checkImage" th:src="@{/kaptcha/getKaptchaImage}" />
+                        <a href="#" style="width:50px;" onclick="changCode()"><font color="white">换一张</font></a>
+                    </div>
+                </div>
+                <div><input id="submit" type="submit" value="登录"
+                            style="width:80px;height:30px;margin-right: 10px;margin-left: 70px"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:fit="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>考勤统计</title>
+</head>
+<body>
+<div>
+    <table id="AttendanceQuery_table" class="easyui-datagrid"/>
+</div>
+<!--AttendanceQuery的工具栏-->
+<div id="AttendanceQueryToolbar" style="padding:5px;height:auto">
+    <!--折叠面板-->
+    <div id="AttendanceQuery_accordion" class="easyui-accordion" style=" width:1166px;border: none">
+        <!--为了实现面板默认是关闭的，因为如果有多个面板默认打开第一个-->
+        <div id="AttendanceQuery_search_none" title=""/>
+        <div id="AttendanceQuery_search" title="查询" data-options="iconCls:'icon-search'" style="overflow:auto;padding:10px;">
+            <div id="AttendanceQuery_search_div">
+                <input id="AttendanceQuery_startTime_datebox" class="easyui-datebox" style="width:90px"/>
+                至：<input id="AttendanceQuery_endTime_datebox" class="easyui-datebox" style="width:90px"/>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                教研室：
+                <input id="AttendanceQuery_department_combobox" class="easyui-combobox" style="width: 120px"/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="#" id="AttendanceQuery_search_btn" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="searchAttendanceQuery()" style="width: auto">查询</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="#" id="AttendanceQuery_exportExcel_btn" class="easyui-linkbutton" iconCls="icon-print" plain="true" onclick="attendanceQueryExportExcel()" style="width: auto">导出</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="../static/isFile/index.js" th:src="@{/jsFile/attendanceQuery.js}"></script>
+</body>
+</html>

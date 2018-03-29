@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:fit="http://www.w3.org/1999/xhtml">
+<body>
+
+
+<script type="text/javascript">
+
+    //jquery.validatebox.js  扩展  正则表达式
+    //validatebox是easyui的验证控件，采用正则表达式，扩展jquery.validatebox.js，以使easyui能验证更多的东西
+    $.extend($.fn.validatebox.defaults.rules, {
+        //数字
+        Number: {
+            // 做验证以确定文本框的内容是否是有效的
+            validator: function (value) {
+                var reg =/^[0-9]*$/;
+                return reg.test(value);
+            },
+            message: '此处只能输入数字'
+        },
+        //年份
+        Year: {
+            validator: function (value) {
+                var reg =/^(?:19|20)[0-9][0-9]$/;
+                return reg.test(value);
+            },
+            message: '输入正确的年份'
+        },
+    })
+
+    //基础路径
+    function basePath(){
+        var curWwwPath = window.document.location.href;
+        var pathName =  window.document.location.pathname;
+        var pos = curWwwPath.indexOf(pathName);
+        var localhostPaht = curWwwPath.substring(0,pos);
+        var projectName = pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+        return (localhostPaht + projectName);
+    }
+    //这个table不起作用，只是为了让其他datagrid正常显示
+    $(function () {
+        $('#noUse').datagrid({});
+    });
+    var editRow = undefined;
+    var rowData = undefined;
+    var nowYear = new Date().getFullYear();
+    var emplId = undefined;
+    //获取行
+    function getRow(dat){
+        var rows = $(dat).datagrid('getRows'); // get current page rows
+        rowData = rows[editRow]; // your row data
+    }
+    //显示职员列表
+    $(function(){
+        $('#employee_scientificResearch_table').datagrid({
+            method:'get',
+            title:'职员列表',
+            url:basePath()+'/displayAllEmployeeName',
+            width: 300,
+            height:550,
+            singleSelect: true,
+            rowNumbers: "true",//显示行号
+            remoteSort: false,//对本地数据进行排序
+            fitColumns:true,//自适应表格大小
+            columns: [[
+                //field必须要和后台get方法名get后面的东西一致（json字段名）
+                {field: 'id', title: 'id',hidden:true},
+                {field: 'no', title: '职工号', width: 80, align: 'center'},
+                {field: 'name', title: '姓名', width: 60, align: 'center'},
+            ]],
+            pagination: "true",//分页
+            onClickRow:function(rowIndex,rowData){
+                emplId = rowData.id;
+                var projectFundedByPrivateSectorUrl = basePath()+'/displayProjectFundedByPrivateSectorByEmp?id='+rowData.id;
+                $('#ProjectFundedByPrivateSector_table').datagrid('reload',projectFundedByPrivateSectorUrl);
+                var projectFundedByGovernmentUrl = basePath()+'/displayProjectFundedByGovernmentByEmp?id='+rowData.id;
+                $('#ProjectFundedByGovernment_table').datagrid('reload',projectFundedByGovernmentUrl);
+                var thesisUrl = basePath()+'/displayScienThesisByEmp?id='+rowData.id;
+                $('#Thesis_table').datagrid('reload',thesisUrl);
+                var awardsUrl = basePath()+'/displayScienAwardsByEmp?id='+rowData.id;
+                $('#Awards_table').datagrid('reload',awardsUrl);
+                var textBookUrl = basePath()+'/displayTextbookByEmp?id='+rowData.id;
+                $('#TextBook_table').datagrid('reload',textBookUrl);
+                var monographUrl = basePath()+'/displayMonographByEmp?id='+rowData.id;
+                $('#Monograph_table').datagrid('reload',monographUrl);
+            }, 
+        });
+        //分页用的获取datagrid中的详细内容，后台只需要获取easyui自动提供pages和rows（我好像需要一个rows）即可。
+        var p = $('#employee_scientificResearch_table').datagrid('getPager');
+        $(p).pagination({
+            onBeforefresh:function () {
+                $(this).pagination('loading');
+                alert('before refresh');
+                $(this).pagination('loaded');
+            }
+        });
+    });
+    //项目（横向）
+    $(function () {
+        $('#ProjectFundedByPrivateSector_table').datagrid({
+            method:'get',
+            fit:true,
+            striped:true,//行背景交换
+//            nowrap:false,//列内容多时自动折至下一行,对于英文字母、数字以及英文字符无效只识别汉字
+            rowNumbers: true,//显示行号
+            remoteSort: false,//对本地数据进行排序
+            fitColumns:true,//自适应表格大小
+            columns: [[
+                {field:'id',title:'ID',width:60,hidden:true,id:"id"},
+                {field:'employee',hidden:true},
+                {field: 'projectFundedByPrivateSectorRank', title: '级别', width: 70, fixed:true, align: 'center',
+                    formatter: function (value, rec) {//格式化行数据，value是字段的值，rec是行的记录数据
+                        if(rec.projectFundedByPrivateSectorRank == null){
+                            return '无';
+                        } else {
+                            return rec.projectFundedByPrivateSectorRank.description;
+                        }
+                    },
+                },
+                {field: 'name', title: '名称', width: 100, align: 'center',},
+                {field: 'no', title: '编号', width: 80, align: 'center'},
+                {field: 'resource', title: '来源', width: 100, align: 'center'},
+                {field: 'leader', title: '项目负责人', width: 90, align: 'center'},
+                {field: 'sponsor', title: '批准部门', width: 80, align: 'center'},
+                {field: 'startTime', title: '开始时间', width: 90, align: 'center'},
+                {field: 'endTime', title: '结束时间', width: 90, align: 'center'},
+                {field: 'expenditure', title: '经费（万）', width: 80, align: 'center'},
+                {field: 'seating', title: '本人位次', width: 80, align: 'center'},
+                {field: 'numOfParticipants', title: '参加人数', width: 80, align: 'center'},
+                {field: 'checkingStatus', title: '状态', width: 110, align: 'center',
+                    formatter: function (value, rec) {
+                        if(rec.checkingStatus == null){
+                            return '未审核';
+                        }else{
+                            return rec.checkingStatus.state;
+                        }
+                    },
+                    editor:{
+                        type:'combobox',
+                        options:{
+                            url:basePath()+'/findAllScienReasCheckingStatus',
+                            method:'get',
+                            valueField:'id',
+                            textField:'state',
+                            panelHeight:'auto',
+                            required:true,
+                            onLoadSuccess:function(data){
+                                getRow('#ProjectFundedByPrivateSector_table');
+                                if(data){
+                                    if(rowData.checkingStatus==null){//如果没有值,默认选中第一个(相当于添加状态)
+                                        $(this).combobox('setValue',data[0].id);
+                                    } else{//相当于编辑状态
+                                        $(this).combobox('setValue',rowData.checkingStatus.id);
+                                    }
+                                }
+                            },
+                        }
+                    },}
+            ]],
+            toolbar: '#ProjectFundedByPrivateSectorToolbar',
+            //endEdit触发后
+            onAfterEdit: function (rowIndex, rowData, changes) {//rowIndex：编辑行的索引，从 0 开始;rowData：编辑行对应的记录;changes：更改的字段/值对
+                console.info(rowData);//控制台输出数据
+                //当editRow非 未定义状态 表示此时是编辑后触发的endEdit事件
+                //if(editRow!=undefined){
+                    $.postJSON1(basePath()+'/updateProjectFundedByPrivateSector', rowData, '#ProjectFundedByPrivateSector_table');
+                //}
+                editRow = undefined;//保存后，编辑行重新变为未定义
+            },
+            onCancelEdit: function (rowIndex, rowData) {
+                editRow = undefined;
+            },
+            //双击一行
+            onDblClickRow:function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#ProjectFundedByPrivateSector_table").datagrid('endEdit', editRow);
+                }else {
+                    $("#ProjectFundedByPrivateSector_table").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            pagination: "true",//分页
+        });
+        //分页用的获取datagrid中的详细内容，后台只需要获取easyui自动提供pages和rows（我好像需要一个rows）即可。
+        var p = $('#ProjectFundedByPrivateSector_table').datagrid('getPager');
+        $(p).pagination({
+            showPageList:false,
+            beforePageText: '第',//页数文本框前显示的汉字
+            afterPageText: '页    共 {pages} 页',
+            displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+            onBeforefresh:function () {
+                $(this).pagination('loading');
+                alert('before refresh');
+                $(this).pagination('loaded');
+            }
+        });
+    });
+    //项目（纵向）
+    $(function () {
+        $('#ProjectFundedByGovernment_table').datagrid({
+            method:'get',
+            fit:true,
+            striped:true,//行背景交换
+//            nowrap:false,//列内容多时自动折至下一行,对于英文字母、数字以及英文字符无效只识别汉字
+            rowNumbers: true,//显示行号
+            remoteSort: false,//对本地数据进行排序
+            fitColumns:true,//自适应表格大小
+            columns: [[
+                {field:'id',title:'ID',width:60,hidden:true,id:"id"},
+                {field:'employee',hidden:true},
+                {field: 'projectFundedByGovernmentRank', title: '级别', width: 70, fixed:true, align: 'center',
+                    formatter: function (value, rec) {//格式化行数据，value是字段的值，rec是行的记录数据
+                        if(rec.projectFundedByGovernmentRank == null){
+                            return '无';
+                        }
+                        else {
+                            return rec.projectFundedByGovernmentRank.description;
+                        }
+                    },
+                },
+                {field: 'name', title: '名称', width: 100, align: 'center',},
+                {field: 'no', title: '编号', width: 80, align: 'center'},
+                {field: 'resource', title: '来源', width: 100, align: 'center'},
+                {field: 'leader', title: '项目负责人', width: 90, align: 'center'},
+                {field: 'sponsor', title: '批准部门', width: 80, align: 'center'},
+                {field: 'startTime', title: '开始时间', width: 90, align: 'center'},
+                {field: 'endTime', title: '结束时间', width: 90, align: 'center'},
+                {field: 'expenditure', title: '经费（万）', width: 80, align: 'center'},
+                {field: 'seating', title: '本人位次', width: 80, align: 'center'},
+                {field: 'numOfParticipants', title: '参加人数', width: 80, align: 'center'},
+                {field: 'checkingStatus', title: '状态', width: 110, align: 'center',
+                    formatter: function (value, rec) {
+                        if(rec.checkingStatus == null){
+                            return '未审核';
+                        }
+                        else {
+                            return rec.checkingStatus.state;
+                        }
+                    },
+                    editor:{
+                        type:'combobox',
+                        options:{
+                            url:basePath()+'/findAllScienReasCheckingStatus',
+                            method:'get',
+                            valueField:'id',
+                            textField:'state',
+                            panelHeight:'auto',
+                            required:true,
+                            onLoadSuccess:function(data){
+                                getRow('#ProjectFundedByGovernment_table');
+                                if(data){
+                                    if(rowData.checkingStatus==null){//如果没有值,默认选中第一个(相当于添加状态)
+                                        $(this).combobox('setValue',data[0].id);
+                                    } else{//相当于编辑状态
+                                        $(this).combobox('setValue',rowData.checkingStatus.id);
+                                    }
+                                }
+                            },
+                        }
+                    },}
+            ]],
+            toolbar: '#ProjectFundedByGovernmentToolbar',
+            //endEdit触发后
+            onAfterEdit: function (rowIndex, rowData, changes) {//rowIndex：编辑行的索引，从 0 开始;rowData：编辑行对应的记录;changes：更改的字段/值对
+                console.info(rowData);//控制台输出数据
+                //当editRow非 未定义状态 表示此时是编辑后触发的endEdit事件
+                //if(editRow!=undefined){
+                $.postJSON1(basePath()+'/updateProjectFundedByGovernment', rowData, '#ProjectFundedByGovernment_table');
+                //}
+                editRow = undefined;//保存后，编辑行重新变为未定义
+            },
+            onCancelEdit: function (rowIndex, rowData) {
+                editRow = undefined;
+            },
+            //双击一行
+            onDblClickRow:function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#ProjectFundedByGovernment_table").datagrid('endEdit', editRow);
+                }else {
+                    $("#ProjectFundedByGovernment_table").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            pagination: "true",//分页
+        });
+        //分页用的获取datagrid中的详细内容，后台只需要获取easyui自动提供pages和rows（我好像需要一个rows）即可。
+        var p = $('#ProjectFundedByGovernment_table').datagrid('getPager');
+        $(p).pagination({
+            showPageList:false,
+            beforePageText: '第',//页数文本框前显示的汉字
+            afterPageText: '页    共 {pages} 页',
+            displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+            onBeforefresh:function () {
+                $(this).pagination('loading');
+                alert('before refresh');
+                $(this).pagination('loaded');
+            }
+        });
+    });
+    //论文
+    $(function () {
+        $('#Thesis_table').datagrid({
+            method:'get',
+            fit:true,
+            striped:true,//行背景交换
+            // nowrap:false,//列内容多时自动折至下一行,对于英文字母、数字以及英文字符无效只识别汉字
+            rowNumbers: true,//显示行号
+            remoteSort: false,//对本地数据进行排序
+            fitColumns:true,//自适应表格大小
+            columns: [[
+                {field:'id',title:'ID',width:60,hidden:true,id:"id"},
+                {field:'employee',hidden:true},
+                {field: 'title', title: '题目', width: 80, align: 'center'},
+                {field: 'name', title: '期刊名称', width: 80, align: 'center'},
+                {field: 'journalRank', title: '期刊级别', width: 80, align: 'center',
+                    formatter: function (value, rec) {//格式化行数据，value是字段的值，rec是行的记录数据
+                        if(rec.journalRank == null){
+                            return '无';
+                        }
+                        else {
+                            return rec.journalRank.description;
+                        }
+                    },
+                },
+                {field: 'seating', title: '本人位次', width: 80, align: 'center'},
+                {field: 'numOfParticipants', title: '参加人数', width: 70, align: 'center'},
+                {field: 'year', title: '发表-年', width: 80, align: 'center'},
+                {field: 'issue', title: '发表-期', width: 80, align: 'center'},
+                {field: 'volume', title: '发表-卷', width: 80, align: 'center'},
+                {field: 'startingPageNo', title: '起始页码', width: 80, align: 'center'},
+                {field: 'endingPageNo', title: '结束页码', width: 80, align: 'center'},
+                {field: 'citation', title: '收录情况', width: 80, align: 'center',
+                    formatter: function (value, rec) {//格式化行数据，value是字段的值，rec是行的记录数据
+                        if(rec.citation == null){
+                            return '无';
+                        }
+                        else {
+                            return rec.citation.description;
+                        }
+                    },
+                },
+                {field: 'checkingStatus', title: '审核状态', width: 110, align: 'center',
+                    formatter: function (value, rec) {
+                        if(rec.checkingStatus == null){
+                            return '未审核';
+                        }
+                        else {
+                            return rec.checkingStatus.state;
+                        }
+                    },
+                    editor:{
+                        type:'combobox',
+                        options:{
+                            url:basePath()+'/findAllScienReasCheckingStatus',
+                            method:'get',
+                            valueField:'id',
+                            textField:'state',
+                            panelHeight:'auto',
+                            required:true,
+                            onLoadSuccess:function(data){
+                                getRow('#Thesis_table');
+                                if(data){
+                                    if(rowData.checkingStatus==null){//如果没有值,默认选中第一个(相当于添加状态)
+                                        $(this).combobox('setValue',data[0].id);
+                                    } else{//相当于编辑状态
+                                        $(this).combobox('setValue',rowData.checkingStatus.id);
+                                    }
+                                }
+                            },
+                        }
+                    },}
+            ]],
+            toolbar: '#ThesisToolbar',
+            //endEdit触发后
+            onAfterEdit: function (rowIndex, rowData, changes) {//rowIndex：编辑行的索引，从 0 开始;rowData：编辑行对应的记录;changes：更改的字段/值对
+                console.info(rowData);//控制台输出数据
+                //当editRow非 未定义状态表示此时是编辑后触发的endEdit事件
+                if(editRow!=undefined){
+                    $.postJSON1(basePath()+'/updateThesis', rowData, '#Thesis_table');
+                }
+                editRow = undefined;//保存后，编辑行重新变为未定义
+            },
+            onCancelEdit: function (rowIndex, rowData) {
+                editRow = undefined;
+            },
+            //双击一行
+            onDblClickRow:function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#Thesis_table").datagrid('endEdit', editRow);
+                }else {
+                    $("#Thesis_table").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            pagination: "true",//分页
+        });
+        //分页用的获取datagrid中的详细内容，后台只需要获取easyui自动提供pages和rows（我好像需要一个rows）即可。
+        var p = $('#Thesis_table').datagrid('getPager');
+        $(p).pagination({
+            showPageList:false,
+            beforePageText: '第',//页数文本框前显示的汉字
+            afterPageText: '页    共 {pages} 页',
+            displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+            onBeforefresh:function () {
+                $(this).pagination('loading');
+                alert('before refresh');
+                $(this).pagination('loaded');
+            }
+        });
+    });
+    //获奖
+    $(function () {
+        $('#Awards_table').datagrid({
+            method:'get',
+            fit:true,
+            striped:true,//行背景交换
+//            nowrap:false,//列内容多时自动折至下一行,对于英文字母、数字以及英文字符无效只识别汉字
+            rowNumbers: true,//显示行号
+            remoteSort: false,//对本地数据进行排序
+            fitColumns:true,//自适应表格大小
+            columns: [[
+                {field:'id',title:'ID',width:60,hidden:true,id:"id"},
+                {field:'employee',hidden:true},
+                {field: 'awardsRank', title: '级别', width: 70, fixed:true, align: 'center',
+                    formatter: function (value, rec) {//格式化行数据
+                        if(rec.awardsRank == null){
+                            return '无';
+                        }
+                        else {
+                            return rec.awardsRank.description;
+                        }
+                    },
+                },
+                {field: 'title', title: '成果名称', width: 100, align: 'center'},
+                {field: 'author', title: '代表作者', width: 80, align: 'center'},
+                {field: 'name', title: '奖项名称', width: 100, align: 'center'},
+                {field: 'awardLevel', title: '等级', width: 80, align: 'center',
+                    formatter: function (value, rec) {//格式化行数据
+                        if(rec.awardLevel == null){
+                            return '无';
+                        }
+                        else {
+                            return rec.awardLevel.description;
+                        }
+                    },
+                },
+                {field: 'sponsor', title: '批准部门', width: 80, align: 'center'},
+                {field: 'dateOfAward', title: '获奖时间', width: 80, align: 'center'},
+                {field: 'seating', title: '本人位次', width: 80, align: 'center'},
+                {field: 'numOfParticipants', title: '参加人数', width: 70, align: 'center'},
+                {field: 'checkingStatus', title: '状态', width: 110, align: 'center',
+                    formatter: function (value, rec) {
+                        if(rec.checkingStatus == null){
+                            return '未审核';
+                        }
+                        else {
+                            return rec.checkingStatus.state;
+                        }
+                    },
+                    editor:{
+                        type:'combobox',
+                        options:{
+                            url:basePath()+'/findAllScienReasCheckingStatus',
+                            method:'get',
+                            valueField:'id',
+                            textField:'state',
+                            panelHeight:'auto',
+                            required:true,
+                            onLoadSuccess:function(data){
+                                getRow('#Awards_table');
+                                if(data){
+                                    if(rowData.checkingStatus==null){//如果没有值,默认选中第一个(相当于添加状态)
+                                        $(this).combobox('setValue',data[0].id);
+                                    } else{//相当于编辑状态
+                                        $(this).combobox('setValue',rowData.checkingStatus.id);
+                                    }
+                                }
+                            },
+                        }
+                    },}
+            ]],
+            toolbar: '#AwardsToolbar',
+            //endEdit触发后
+            onAfterEdit: function (rowIndex, rowData, changes) {//rowIndex：编辑行的索引，从 0 开始;rowData：编辑行对应的记录;changes：更改的字段/值对
+                console.info(rowData);//控制台输出数据
+                //当editRow非 未定义状态，表示此时是编辑后触发的endEdit事件
+                if(editRow!=undefined){
+                    $.postJSON1(basePath()+'/updateAwards', rowData, '#Awards_table');
+                }
+                editRow = undefined;//保存后，编辑行重新变为未定义
+            },
+            onCancelEdit: function (rowIndex, rowData) {
+                editRow = undefined;
+            },
+            //双击一行
+            onDblClickRow:function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#Awards_table").datagrid('endEdit', editRow);
+                }else{
+                    $("#Awards_table").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            pagination: "true",//分页
+        });
+        //分页用的获取datagrid中的详细内容，后台只需要获取easyui自动提供pages和rows（我好像需要一个rows）即可。
+        var p = $('#Awards_table').datagrid('getPager');
+        $(p).pagination({
+            showPageList:false,
+            beforePageText: '第',//页数文本框前显示的汉字
+            afterPageText: '页    共 {pages} 页',
+            displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+            onBeforefresh:function () {
+                $(this).pagination('loading');
+                alert('before refresh');
+                $(this).pagination('loaded');
+
+            }
+        });
+    });
+    //教材
+    $(function () {
+        $('#TextBook_table').datagrid({
+            method:'get',
+            fit:true,
+            striped:true,//行背景交换
+            rowNumbers: true,//显示行号
+            remoteSort: false,//对本地数据进行排序
+            fitColumns:true,//自适应表格大小
+            columns: [[
+                {field:'id',title:'ID',width:60,hidden:true,id:"id"},
+                {field:'employee',hidden:true},
+                {field: 'name', title: '名称', width: 100, align: 'center',},
+                {field: 'editor', title: '负责人', width: 90, align: 'center'},
+                {field: 'press', title: '出版社', width: 80, align: 'center'},
+                {field: 'publicationTime', title: '出版时间', width: 90, align: 'center'},
+                {field: 'words', title: '千字数', width: 80, align: 'center'},
+                {field: 'textbookRank', title: '级别', width: 70, fixed:true, align: 'center',
+                    formatter: function (value, rec) {//格式化行数据，value是字段的值，rec是行的记录数据
+                        if(rec.textbookRank == null){
+                            return '无';
+                        }
+                        else {
+                            return rec.textbookRank.description;
+                        }
+                    },
+                },
+                {field: 'isbn', title: 'ISBN', width: 80, align: 'center'},
+                {field: 'seating', title: '本人位次', width: 80, align: 'center'},
+                {field: 'numOfParticipants', title: '作者人数', width: 70, align: 'center'},
+                {field: 'checkingStatus', title: '审核状态', width: 110, align: 'center',
+                    formatter: function (value, rec) {
+                        if(rec.checkingStatus == null){
+                            return '未审核';
+                        }
+                        else {
+                            return rec.checkingStatus.state;
+                        }
+                    },
+                    editor:{
+                        type:'combobox',
+                        options:{
+                            //获得所有的状态
+                            url:basePath()+'/findAllScienReasCheckingStatus',
+                            method:'get',
+                            valueField:'id',
+                            textField:'state',
+                            panelHeight:'auto',
+                            required:true,
+                            onLoadSuccess:function(data){
+                                getRow('#TextBook_table');
+                                if(data){
+                                    if(rowData.checkingStatus==null){//如果没有值,默认选中第一个(相当于添加状态)
+                                        $(this).combobox('setValue',data[0].id);
+                                    } else{//相当于编辑状态
+                                        $(this).combobox('setValue',rowData.checkingStatus.id);
+                                    }
+                                }
+                            },
+                        }
+                    },}
+            ]],
+            toolbar: '#TextBookToolbar',
+            //endEdit触发后
+            onAfterEdit: function (rowIndex, rowData, changes) {//rowIndex：编辑行的索引，从 0 开始;rowData：编辑行对应的记录;changes：更改的字段/值对
+                console.info(rowData);//控制台输出数据
+                //当editRow非 未定义状态 表示此时是编辑后触发的endEdit事件
+                if(editRow!=undefined){
+                    //更新
+                    $.postJSON1(basePath()+'/updateTextbook', rowData, '#TextBook_table');
+                }
+                editRow = undefined;//保存后，编辑行重新变为未定义
+            },
+            onCancelEdit: function (rowIndex, rowData) {
+                editRow = undefined;
+            },
+            //双击一行
+            onDblClickRow:function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#TextBook_table").datagrid('endEdit', editRow);
+                }else{
+                    $("#TextBook_table").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            pagination: "true",//分页
+        });
+        //分页用的获取datagrid中的详细内容，后台只需要获取easyui自动提供pages和rows（我好像需要一个rows）即可。
+        var p = $('#TextBook_table').datagrid('getPager');
+        $(p).pagination({
+            showPageList:false,
+            beforePageText: '第',//页数文本框前显示的汉字
+            afterPageText: '页    共 {pages} 页',
+            displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+            onBeforefresh:function () {
+                $(this).pagination('loading');
+                alert('before refresh');
+                $(this).pagination('loaded');
+            }
+        });
+    });
+    //专著
+    $(function () {
+        $('#Monograph_table').datagrid({
+            method:'get',
+            fit:true,
+            striped:true,//行背景交换
+            rowNumbers: true,//显示行号
+            remoteSort: false,//对本地数据进行排序
+            fitColumns:true,//自适应表格大小
+            columns: [[
+                {field:'id',title:'ID',width:60,hidden:true,id:"id"},
+                {field:'employee',hidden:true},
+                {field: 'name', title: '名称', width: 100, align: 'center',},
+                {field: 'author', title: '负责人', width: 90, align: 'center'},
+                {field: 'press', title: '出版社', width: 80, align: 'center'},
+                {field: 'publicationTime', title: '出版时间', width: 90, align: 'center'},
+                {field: 'words', title: '千字数', width: 80, align: 'center'},
+                {field: 'monographRank', title: '级别', width: 70, fixed:true, align: 'center',
+                    formatter: function (value, rec) {//格式化行数据，value是字段的值，rec是行的记录数据
+                        if(rec.monographRank == null){
+                            return '无';
+                        }
+                        else {
+                            return rec.monographRank.description;
+                        }
+                    },
+                },
+                {field: 'isbn', title: 'ISBN', width: 80, align: 'center'},
+                {field: 'seating', title: '本人位次', width: 80, align: 'center'},
+                {field: 'numOfParticipants', title: '作者人数', width: 70, align: 'center'},
+                {field: 'checkingStatus', title: '审核状态', width: 110, align: 'center',
+                    formatter: function (value, rec) {
+                        if(rec.checkingStatus == null){
+                            return '未审核';
+                        }
+                        else {
+                            return rec.checkingStatus.state;
+                        }
+                    },
+                    editor:{
+                        type:'combobox',
+                        options:{
+                            //获得所有的状态
+                            url:basePath()+'/findAllScienReasCheckingStatus',
+                            method:'get',
+                            valueField:'id',
+                            textField:'state',
+                            panelHeight:'auto',
+                            required:true,
+                            onLoadSuccess:function(data){
+                                getRow('#Monograph_table');
+                                if(data){
+                                    if(rowData.checkingStatus==null){//如果没有值,默认选中第一个(相当于添加状态)
+                                        $(this).combobox('setValue',data[0].id);
+                                    } else{//相当于编辑状态
+                                        $(this).combobox('setValue',rowData.checkingStatus.id);
+                                    }
+                                }
+                            },
+                        }
+                    },}
+            ]],
+            toolbar: '#MonographToolbar',
+            //endEdit触发后
+            onAfterEdit: function (rowIndex, rowData, changes) {//rowIndex：编辑行的索引，从 0 开始;rowData：编辑行对应的记录;changes：更改的字段/值对
+                console.info(rowData);//控制台输出数据
+                //当editRow非 未定义状态 表示此时是编辑后触发的endEdit事件
+                if(editRow!=undefined){
+                    //更新
+                    $.postJSON1(basePath()+'/updateMonograph', rowData, '#Monograph_table');
+                }
+                editRow = undefined;//保存后，编辑行重新变为未定义
+            },
+            onCancelEdit: function (rowIndex, rowData) {
+                editRow = undefined;
+            },
+            //双击一行
+            onDblClickRow:function (rowIndex, rowData) {
+                if (editRow != undefined) {
+                    $("#Monograph_table").datagrid('endEdit', editRow);
+                }else{
+                    $("#Monograph_table").datagrid('beginEdit', rowIndex);
+                    editRow = rowIndex;
+                }
+            },
+            pagination: "true",//分页
+        });
+        //分页用的获取datagrid中的详细内容，后台只需要获取easyui自动提供pages和rows（我好像需要一个rows）即可。
+        var p = $('#Monograph_table').datagrid('getPager');
+        $(p).pagination({
+            showPageList:false,
+            beforePageText: '第',//页数文本框前显示的汉字
+            afterPageText: '页    共 {pages} 页',
+            displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+            onBeforefresh:function () {
+                $(this).pagination('loading');
+                alert('before refresh');
+                $(this).pagination('loaded');
+            }
+        });
+    });
+
+    //更新操作
+    $.postJSON1 = function(url, data, datagrid) {
+        return jQuery.ajax({
+            'type' : 'PUT',
+            'url' : url,
+            'contentType' : 'application/json',
+            'data' : JSON.stringify(data),
+            'dataType' : 'json',
+            success: function (msg) {
+                if (msg.data == undefined) {
+                    $.messager.alert('消息提示', '更新成功', 'info');
+                    $(datagrid).datagrid('reload');//更新成功之后调用
+                } else {
+                    $.messager.alert("操作提示", "操作失败！" + msg.data + "," + msg.message, "error");
+                    $(datagrid).datagrid('reload');
+                }
+            },
+            error:function (msg) {
+                $.messager.alert('消息提示','更新失败','error');
+            }
+        });
+    };
+    //编辑
+    function edit(id) {
+        //修改时获取选择到的行
+        var rows = $(id).datagrid('getSelections');
+        //如果只选择了一行则可以进行修改，否则不操作
+        if (rows.length==1) {
+            //修改前先关闭已经开启的编辑行，当调用endEdit方法时会触发onAfterEdit事件
+//            if (editRow != undefined) {
+//                $(id).datagrid('endEdit', editRow);
+//            }
+            //当无编辑行时
+            if (editRow == undefined) {
+                //获取到当前选择行的下标
+                var index = $(id).datagrid('getRowIndex', rows[0]);
+                //开启编辑
+                $(id).datagrid('beginEdit', index);
+                //把当前开启编辑行赋给变量editRow
+                editRow = index;
+                //当开启了当前选择行的编辑状态之后，
+                //应该取消当前列表的所有选择行，要不然双击之后在无法选择其他行进行编辑
+                //$(id).datagrid('unselectAll');
+            }
+        } else {
+            $.messager.alert("提示","只能选择一行进行编辑","error");
+        }
+    }
+    //保存
+    function save(id) {
+        //保存时结束当前编辑的行，自动触发onAfterEdit事件如果要与后台交互可将数据通过Ajax提交后台
+        $(id).datagrid('endEdit', editRow);
+        if(editRow!=undefined){//如果验证不通过就不会触发onAfterEdit，直接进入执行if语句
+            $.messager.alert('消息提示','请检查输入信息,查看红色字段','error');
+        }
+    }
+    //取消编辑
+    function cancel(id) {
+        //取消当前编辑行把当前编辑行undefined回滚改变的数据,取消选择的行
+        if(editRow!=undefined){
+            $(id).datagrid('cancelEdit', editRow);
+        }
+    }
+
+    //下拉框
+    $(function () {
+        //论文
+        initCombobox('#Thesis_journalRank_combobox','description',basePath()+'/findAllJournalRanks');
+        initCombobox('#Thesis_citation_combobox','description',basePath()+'/findAllCitation');
+        //教材-专著
+        initCombobox('#TextBook_textbookRank_combobox','description',basePath()+'/findAllTextbookRanks');
+        initCombobox('#Monograph_monographRank_combobox','description',basePath()+'/findAllMonographRanks');
+        initCombobox('#TextBook_checkingStatus_combobox','state',basePath()+'/findAllScienReasCheckingStatus');
+        initCombobox('#Monograph_checkingStatus_combobox','state',basePath()+'/findAllScienReasCheckingStatus');
+        //项目-横向加纵向
+        initCombobox('#ProjectFundedByPrivateSector_projectRank_combobox','description',basePath()+'/findAllProjectFundedByPrivateSectorRanks');
+        initCombobox('#ProjectFundedByGovernment_projectRank_combobox','description',basePath()+'/findAllProjectFundedByGovernmentRanks');
+        initCombobox('#ProjectFundedByPrivateSector_checkingStatus_combobox','state',basePath()+'/findAllScienReasCheckingStatus');
+        initCombobox('#ProjectFundedByGovernment_checkingStatus_combobox','state',basePath()+'/findAllScienReasCheckingStatus');
+        //获奖
+        initCombobox('#Awards_awardsRank_combobox','description',basePath()+'/findAllAwardsRanks');
+        initCombobox('#Awards_checkingStatus_combobox','state',basePath()+'/findAllScienReasCheckingStatus');
+    });
+    //数值微调器，基于微调器和数值框
+    $('#Thesis_yearStart_numberspinner').numberspinner({
+        value:nowYear,
+        min:nowYear-10,
+        max:nowYear,
+        //可编辑的
+        editable:true,
+        required:true,
+    });
+    $('#Thesis_yearEnd_numberspinner').numberspinner({
+        value:nowYear,
+        min:nowYear,
+        max:nowYear+10,
+        editable:true,
+        required:true,
+    });
+//    $('#publishingYear').numberspinner({
+//        value:nowYear,
+//        min:nowYear-10,
+//        max:nowYear,
+//        editable:true,
+//        required:true,
+//    });
+    //初始化多选下拉框
+    function initCombobox(id,context,url) {
+        //加载下拉框信息
+        $(id).combobox({
+            //required:false,
+            method:'get',
+            url:url,
+            valueField:'id',
+            textField:context,
+            multiple:true,
+            panelHeight:'auto'
+        });
+    }
+
+    //关于查询
+    //论文的查询
+    function searchThesis() {
+        var journalRank = $('#Thesis_journalRank_combobox').combobox('getValues');
+        var citation = $('#Thesis_citation_combobox').combobox('getValues');
+        var beginYear = $('#Thesis_yearStart_numberspinner').numberspinner('getValue');
+        var endYear = $('#Thesis_yearEnd_numberspinner').numberspinner('getValue');
+        var url = basePath()+'/dispThesisQuerry?journalRankIds='+journalRank
+                +'&;citationIds='+citation
+                +'&;beginYear='+beginYear
+                +'&;endYear='+endYear;
+        $('#Thesis_table').datagrid('reload',url);
+    }
+    //教材的查询
+    function searchTextBook() {
+        var seating = $('#TextBook_seating_textbox').textbox('getValue');
+        var publishingStart = $('#TextBook_publicationStartTime_dbox').datebox('getValue');
+        var publishingEnd = $('#TextBook_publicationEndTime_dbox').datebox('getValue');
+        var textbookRank = $('#TextBook_textbookRank_combobox').combobox('getValues');
+        var states=$('#TextBook_checkingStatus_combobox').combobox('getValues');
+        var url = basePath()+'/dispBooksSpecification?seating='+seating
+                +'&;publishingStart='+publishingStart
+                +'&;publishingEnd='+publishingEnd
+                +'&;textbookRankIds='+textbookRank
+                +'&;checkingStatusIds='+states;
+        $('#TextBook_table').datagrid('reload',url);
+    }
+    //专著的查询
+    function searchsMonograph() {
+        var seating = $('#Monograph_seating_textbox').textbox('getValue');
+        var publishingStart = $('#Monograph_publicationStartTime_dbox').datebox('getValue');
+        var publishingEnd = $('#Monograph_publicationEndTime_dbox').datebox('getValue');
+        var monographRank = $('#Monograph_monographRank_combobox').combobox('getValues');
+        var states=$('#Monograph_checkingStatus_combobox').combobox('getValues');
+        var url = basePath()+'/dispMonographSpecification?seating='+seating
+                +'&;publishingStart='+publishingStart
+                +'&;publishingEnd='+publishingEnd
+                +'&;monographRankIds='+monographRank
+                +'&;checkingStatusIds='+states;
+        $('#Monograph_table').datagrid('reload',url);
+    }
+    //项目（横向）的查询
+    function searchProjectFundedByPrivateSector() {
+        var expenditure = $('#ProjectFundedByPrivateSector_expenditure_textbox').textbox('getValue');
+        var start = $('#ProjectFundedByPrivateSector_startTime_dbox').datebox('getValue');
+        var end = $('#ProjectFundedByPrivateSector_endTime_dbox').datebox('getValue');
+        var ranks = $('#ProjectFundedByPrivateSector_projectRank_combobox').combobox('getValues');
+        var states=$('#ProjectFundedByPrivateSector_checkingStatus_combobox').combobox('getValues');
+        var url = basePath()+'//dispProjectFundedByPrivateSectorSpecification?expenditure='+expenditure
+                +'&;startTime='+start
+                +'&;endTime='+end
+                +'&;projectRankIds='+ranks
+                +'&;checkingStatusIds='+states;
+        $('#ProjectFundedByPrivateSector_table').datagrid('reload',url);
+    }
+    //项目（纵向）的查询
+    function searchProjectFundedByGovernment() {
+        var expenditure = $('#ProjectFundedByGovernment_expenditure_textbox').textbox('getValue');
+        var start = $('#ProjectFundedByGovernment_startTime_dbox').datebox('getValue');
+        var end = $('#ProjectFundedByGovernment_endTime_dbox').datebox('getValue');
+        var ranks = $('#ProjectFundedByGovernment_projectRank_combobox').combobox('getValues');
+        var states=$('#ProjectFundedByGovernment_checkingStatus_combobox').combobox('getValues');
+        var url = basePath()+'/dispProjectFundedByGovernmentSpecification?expenditure='+expenditure
+                +'&;startTime='+start
+                +'&;endTime='+end
+                +'&;projectRankIds='+ranks
+                +'&;checkingStatusIds='+states;
+        $('#ProjectFundedByGovernment_table').datagrid('reload',url);
+    }
+    //获奖的查询
+    function searchAwards() {
+        var ranks = $('#Awards_awardsRank_combobox').combobox('getValues');
+        var start = $('#Awards_dateOfAwardsStart_dbox').datebox('getValue');
+        var end = $('#Awards_dateOfAwardsEnd_dbox').datebox('getValue');
+        var seating = $('#Awards_seating_textbox').textbox('getValue');
+        var states=$('#Awards_checkingStatus_combobox').combobox('getValues');
+        var url = basePath()+'/dispAwardsSpecification?awardsRankIds='+ranks
+                +'&;startTime='+start
+                +'&;endTime='+end
+                +'&;seating='+seating
+                +'&;checkingStatusId='+states
+        $('#Awards_table').datagrid('reload',url);
+    }
+
+</script>
+<div id="kygl">
+    <!--这个table不起作用，只是为了让其他datagrid正常显示-->
+    <div id="none_dialog" class="easyui-dialog" closed="true">
+        <table id="noUse" class="easyui-datagrid"/>
+    </div>
+    <!--Datagrid-->
+    <div id="employee_scientificResearch_div" style="float: left">
+        <table id="employee_scientificResearch_table" class="easyui-datagrid"/>
+    </div>
+    <!--科研信息-->
+    <div id="employee_scientificResearch_information" style="height: 550px;float: left">
+        <div id="scientificResearch_tabs" class="easyui-tabs" style="width:860px;" fit="true">
+            <div id="ProjectFundedByPrivateSector_tab" title="项目(横向)">
+                <table id="ProjectFundedByPrivateSector_table" class="easyui-datagrid" data-options="nowrap:false"/>
+            </div>
+            <div id="ProjectFundedByGovernment_tab" title="项目(纵向)">
+                <table id="ProjectFundedByGovernment_table" class="easyui-datagrid" data-options="nowrap:false"/>
+            </div>
+            <div id="Thesis_tab" title="论文">
+                <table id="Thesis_table" class="easyui-datagrid" data-options="nowrap:false"/>
+            </div>
+            <div id="Awards_tab" title="获奖">
+                <table id="Awards_table" class="easyui-datagrid" data-options="nowrap:false"/>
+            </div>
+            <div id="TextBook_tab" title="教材">
+                <table id="TextBook_table" class="easyui-datagrid" data-options="nowrap:false"/>
+            </div>
+            <div id="Monograph_tab" title="专著">
+                <table id="Monograph_table" class="easyui-datagrid" data-options="nowrap:false"/>
+            </div>
+        </div>
+    </div>
+    <!--查询条件面板-->
+    <div id="ProjectFundedByPrivateSectorToolbar" style="padding:5px;height:auto">
+        <!--折叠面板-->
+        <div id="ProjectFundedByPrivateSector_accordion" class="easyui-accordion" style=" width:860px;border: none">
+            <div id="ProjectFundedByPrivateSector_search_none" title=""/>
+            <div id="ProjectFundedByPrivateSector_search" title="查询" data-options="iconCls:'icon-search'" style="overflow:auto;padding:10px;">
+                <div id="ProjectFundedByPrivateSector_search_div">
+                    经费：
+                    <input id="ProjectFundedByPrivateSector_expenditure_textbox" class="easyui-textbox" style="width:120px"/>
+                    立项时间：
+                    <input id="ProjectFundedByPrivateSector_startTime_dbox" class="easyui-datebox" style="width:120px"/>
+                    <input id="ProjectFundedByPrivateSector_endTime_dbox" class="easyui-datebox" style="width:120px"/>
+                    级别：
+                    <input id="ProjectFundedByPrivateSector_projectRank_combobox" class="easyui-combobox" style="width:120px"/>
+                    审核状态：
+                    <input id="ProjectFundedByPrivateSector_checkingStatus_combobox" class="easyui-combobox" style="width:120px"/>
+                    <a href="#" id="ProjectFundedByPrivateSector_search_btn" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="searchProjectFundedByPrivateSector()" style="float: right">查询</a>
+                </div>
+            </div>
+        </div>
+        <div id="ProjectFundedByPrivateSector_btn_toolbar" style="margin-bottom:5px">
+            <a href="#" id="ProjectFundedByPrivateSector_edit_btn" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit('#ProjectFundedByPrivateSector_table')">审核</a>
+            <a href="#" id="ProjectFundedByPrivateSector_save_btn" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="save('#ProjectFundedByPrivateSector_table')">确定</a>
+            <a href="#" id="ProjectFundedByPrivateSector_cancel_btn" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="cancel('#ProjectFundedByPrivateSector_table')">取消</a>
+        </div>
+    </div>
+
+    <div id="ProjectFundedByGovernmentToolbar" style="padding:5px;height:auto">
+        <!--折叠面板-->
+        <div id="ProjectFundedByGovernment_accordion" class="easyui-accordion" style=" width:860px;border: none">
+            <div id="ProjectFundedByGovernment_search_none" title=""/>
+            <div id="ProjectFundedByGovernment_search" title="查询" data-options="iconCls:'icon-search'" style="overflow:auto;padding:10px;">
+                <div id="ProjectFundedByGovernment_search_div">
+                    经费：
+                    <input id="ProjectFundedByGovernment_expenditure_textbox" class="easyui-textbox" style="width:120px"/>
+                    立项时间：
+                    <input id="ProjectFundedByGovernment_startTime_dbox" class="easyui-datebox" style="width:120px"/>
+                    <input id="ProjectFundedByGovernment_endTime_dbox" class="easyui-datebox" style="width:120px"/>
+                    级别：
+                    <input id="ProjectFundedByGovernment_projectRank_combobox" class="easyui-combobox" style="width:120px"/>
+                    审核状态：
+                    <input id="ProjectFundedByGovernment_checkingStatus_combobox" class="easyui-combobox" style="width:120px"/>
+                    <a href="#" id="ProjectFundedByGovernment_search_btn" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="searchProjectFundedByGovernment()" style="float: right">查询</a>
+                </div>
+            </div>
+        </div>
+        <div id="ProjectFundedByGovernment_btn_toolbar" style="margin-bottom:5px">
+            <a href="#" id="ProjectFundedByGovernment_edit_btn" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit('#ProjectFundedByGovernment_table')">审核</a>
+            <a href="#" id="ProjectFundedByGovernment_save_btn" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="save('#ProjectFundedByGovernment_table')">确定</a>
+            <a href="#" id="ProjectFundedByGovernment_cancel_btn" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="cancel('#ProjectFundedByGovernment_table')">取消</a>
+        </div>
+    </div>
+
+    <div id="ThesisToolbar" style="padding:5px;height:auto">
+        <!--折叠面板-->
+        <div id="Thesis_accordion" class="easyui-accordion" style=" width:860px;border: none">
+            <!--为了实现面板默认是关闭的，因为如果有多个面板默认打开第一个-->
+            <div id="Thesis_search_none" title=""/>
+            <div id="Thesis_search" title="查询" data-options="iconCls:'icon-search'" style="overflow:auto;padding:10px;">
+                <div id="Thesis_search_div">
+                    期刊级别：
+                    <input id="Thesis_journalRank_combobox" class="easyui-combobox" style="width: 120px"/>
+                    收录情况:
+                    <input id="Thesis_citation_combobox" class="easyui-combobox" style="width:120px"/>
+                    发表-年（开始）：<input id="Thesis_yearStart_numberspinner" class="easyui-numberspinner" style="width:120px"/>
+                    发表-年（结束）：<input id="Thesis_yearEnd_numberspinner" class="easyui-numberspinner" style="width:120px"/><br/><br/>
+                    <a href="#" id="Thesis_search_btn" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="searchThesis()" style="float: right">查询</a>
+                </div>
+            </div>
+        </div>
+        <div id="Thesis_btn_toolbar" style="margin-bottom:5px">
+            <a href="#" id="Thesis_edit_btn" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit('#Thesis_table')">审核</a>
+            <a href="#" id="Thesis_save_btn" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="save('#Thesis_table')">确定</a>
+            <a href="#" id="Thesis_cancel_btn" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="cancel('#Thesis_table')">取消</a>
+        </div>
+    </div>
+
+    <div id="AwardsToolbar" style="padding:5px;height:auto">
+        <!--折叠面板-->
+        <div id="Awards_accordion" class="easyui-accordion" style=" width:860px;border: none">
+            <div id="Awards_search_none" title=""/>
+            <div id="Awards_search" title="查询" data-options="iconCls:'icon-search'" style="overflow:auto;padding:10px;">
+                <div id="Awards_search_div">
+                    位次：
+                    <input id="Awards_seating_textbox" class="easyui-textbox" style="width:120px"/>
+                    立项时间:
+                    <input id="Awards_dateOfAwardsStart_dbox" class="easyui-datebox" style="width:120px"/>
+                    <input id="Awards_dateOfAwardsEnd_dbox" class="easyui-datebox" style="width:120px"/>
+                    级别：
+                    <input id="Awards_awardsRank_combobox" class="easyui-combobox" style="width:120px"/>
+                    审核状态：
+                    <input id="Awards_checkingStatus_combobox" class="easyui-combobox" style="width:120px"/>
+                    <br/><br/>
+                    <a href="#" id="Awards_search_btn" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="searchAwards()" style="float: right">查询</a>
+                </div>
+            </div>
+        </div>
+        <div id="Awards_btn_toolbar" style="margin-bottom:5px">
+            <a href="#" id="Awards_edit_btn" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit('#Awards_table')">审核</a>
+            <a href="#" id="Awards_save_btn" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="save('#Awards_table')">确定</a>
+            <a href="#" id="Awards_cancel_btn" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="cancel('#Awards_table')">取消</a>
+        </div>
+    </div>
+
+    <div id="TextBookToolbar" style="padding:5px;height:auto">
+        <!--折叠面板-->
+        <div id="TextBook_accordion" class="easyui-accordion" style=" width:860px;border: none">
+            <div id="TextBook_search_none" title=""/>
+            <div id="TextBook_search" title="查询" data-options="iconCls:'icon-search'" style="overflow:auto;padding:10px;">
+                <div id="TextBook_search_div">
+                    位次：
+                    <input id="TextBook_seating_textbox" class="easyui-textbox" style="width:120px"/>
+                    出版时间：
+                    <input id="TextBook_publicationStartTime_dbox" class="easyui-datebox" style="width:120px"/>
+                    <input id="TextBook_publicationEndTime_dbox" class="easyui-datebox" style="width:120px"/>
+                    级别：
+                    <input id="TextBook_textbookRank_combobox" class="easyui-combobox" style="width:120px"/>
+                    审核状态：
+                    <input id="TextBook_checkingStatus_combobox" class="easyui-combobox" style="width:120px"/>
+                    <a href="#" id="TextBook_search_btn" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="searchTextBook()" style="float: right">查询</a>
+                </div>
+            </div>
+        </div>
+        <div id="TextBook_btn_toolbar" style="margin-bottom:5px">
+            <a href="#" id="TextBook_edit_btn" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit('#TextBook_table')">审核</a>
+            <a href="#" id="TextBook_save_btn" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="save('#TextBook_table')">确定</a>
+            <a href="#" id="TextBook_cancel_btn" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="cancel('#TextBook_table')">取消</a>
+        </div>
+    </div>
+
+    <div id="MonographToolbar" style="padding:5px;height:auto">
+        <!--折叠面板-->
+        <div id="Monograph_accordion" class="easyui-accordion" style=" width:860px;border: none">
+            <div id="Monograph_search_none" title=""/>
+            <div id="Monograph_search" title="查询" data-options="iconCls:'icon-search'" style="overflow:auto;padding:10px;">
+                <div id="Monograph_search_div">
+                    位次：
+                    <input id="Monograph_seating_textbox" class="easyui-textbox" style="width:120px"/>
+                    出版时间：
+                    <input id="Monograph_publicationStartTime_dbox" class="easyui-datebox" style="width:120px"/>
+                    <input id="Monograph_publicationEndTime_dbox" class="easyui-datebox" style="width:120px"/>
+                    级别：
+                    <input id="Monograph_monographRank_combobox" class="easyui-combobox" style="width:120px"/>
+                    审核状态：
+                    <input id="Monograph_checkingStatus_combobox" class="easyui-combobox" style="width:120px"/>
+                    <a href="#" id="Monograph_search_btn" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="searchsMonograph()" style="float: right">查询</a>
+                </div>
+            </div>
+        </div>
+        <div id="Monograph_btn_toolbar" style="margin-bottom:5px">
+            <a href="#" id="Monograph_edit_btn" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit('#Monograph_table')">审核</a>
+            <a href="#" id="Monograph_save_btn" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="save('#Monograph_table')">确定</a>
+            <a href="#" id="Monograph_cancel_btn" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="cancel('#Monograph_table')">取消</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

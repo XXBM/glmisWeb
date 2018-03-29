@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用章-学生</title>
+    <!--引入jQuery核心库-->
+    <script type="text/javascript" src=""></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+    <!--引入jQuery EasyUI核心库-->
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+    <!--引入EasyUI中文提示信息-->
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js" ></script>
+    <!--引入自己开发的JS文件-->
+    <script type="text/javascript" src="sealUse.js"></script>
+    <!--引EeasyUI核心ui css-->
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css" />
+    <!--引入EasyUI图标-->
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css" />
+
+</head>
+<body>
+<div class="easyui-panel" style="width:520px;height:300px">
+    <div style="margin-left:10px;">
+        <p style="color:#0000FF"><a href="#" style="text-decoration:none;color:#0000FF">行政管理>用章>学生查看</a><input type="button" class="easyui-button" value="新建申请" onclick="obj.dialog();" style="display:block;float:right;margin-right:10px">
+        </p>
+    </div>
+    <div style="margin-left:10px;">
+        <table id="table" text-align="center">
+        </table>
+        <div id="tb" style="padding:5px">
+            <div style="margin-bottom:5px;">
+                <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="obj.edit();">修改</a>
+                <a href="#" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="obj.redo();">撤回申请</a>
+                <a href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" style="display: none;" id="save" onclick="obj.save();">保存</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--对话框-->
+<div id="dialog" class="easyui-dialog" title="行政管理>用章>学生>新建申请" closed="true" style="width:460px;height:300px;padding-top:20px">
+    <div id="login">
+        <form id="form" method="post" style="padding-left:25px;">
+            <table cellspacing="15" width="400px">
+                <tr>
+                    <td align="right" width="100px">申请时间：</td>
+                    <td><input type="text" name="name" class="easyui-datetimebox" value="now()" data-options="required:true"></td>
+                </tr>
+                <tr>
+                    <td align="right">内容：</td>
+                    <td><input type="text" name="email" class="easyui-validatebox" data-options="required:true,prompt:'请输入申请理由'"></td>
+                </tr>
+                <tr>
+                    <td align="right">用章资料照片：</td>
+                    <td width="200px">
+                        <input class="easyui-filebox" data-options="prompt:'选择文件',buttonText:'选择文件'">
+                    </td>
+                </tr>
+            </table>
+            <div style="margin-top: 30px;margin-left: 50px">
+                <input type="button" class="easyui-button" value="提交" onclick="obj.tijiao();"style="width:80px;height:30px;margin-left:20px">
+                <input type="button" class="easyui-button" value="取消" onclick="obj.quxiao();"style="width:80px;height:30px;margin-left:85px">
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--对话框-->
+<div id="dialog2" class="easyui-dialog" title="行政管理>用章>学生>修改申请" closed="true" style="width:460px;height:300px;padding-top:20px">
+    <div id="login2">
+        <form id="form2" method="post" style="padding-left:25px;">
+            <table cellspacing="15" width="400px">
+                <tr>
+                    <td align="right" width="100px">申请时间：</td>
+                    <td><input type="text" name="name" class="easyui-datetimebox" value="now()" data-options="required:true"></td>
+                </tr>
+                <tr>
+                    <td align="right">内容：</td>
+                    <td><input type="text" name="email" class="easyui-validatebox" data-options="required:true,prompt:'请输入申请理由'"></td>
+                </tr>
+                <tr>
+                    <td align="right">用章资料照片：</td>
+                    <td width="200px">
+                        <input class="easyui-filebox" data-options="prompt:'选择文件',buttonText:'选择文件'">
+                    </td>
+                </tr>
+            </table>
+            <div style="margin-top: 30px;margin-left: 50px">
+                <input type="button" class="easyui-button" value="提交" onclick="obj.tijiao2();"style="width:80px;height:30px;margin-left:20px">
+                <input type="button" class="easyui-button" value="取消" onclick="obj.quxiao();"style="width:80px;height:30px;margin-left:85px">
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

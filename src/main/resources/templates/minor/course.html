@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生查看课表/支付学费</title>
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css"/>
+    <style type="text/css">
+        /*数据表格单元格的高度*/
+        .datagrid-btable tr{height: 50px;}
+        /*数据表格标题的字体大小*/
+        .datagrid-header span {font-size: 15px !important;}
+
+
+    </style>
+</head>
+<body>
+<span  style="padding:0px;font-family:宋体 ;font-size:15px" >辅修系统>学生>查看课表/支付学费</span>
+<span  style="padding:0 0 0 60%;font-family:宋体 ;font-size:15px" >当前用户：张三丰 2015021111</span></br></br>
+<div>
+    <div>
+        <select class="easyui-combobox" style="width:300px;height:30px">
+            <option value="ar">2016学年秋季</option>
+            <option value="ar">2016学年夏季</option>
+        </select>
+    </div></br></br>
+    <div>
+        <table border="1px" id = "tt">
+            <thead>
+            <tr>
+                <th data-options="field:'t1'"style="width:15%;">时间</th>
+                <th data-options="field:'t2'"style="width:5%;"> 教室</th>
+                <th data-options="field:'t3'" style="width:13%;">应修专业</th>
+                <th data-options="field:'t4'" style="width:5%;">学分</th>
+                <th data-options="field:'t5'" style="width:5%;">学时</th>
+                <th data-options="field:'t6'" style="width:20%;">教材</th>
+                <th data-options="field:'t7'" style="width:15%;">任课教师</th>
+                <th data-options="field:'t8'" style="width:5%;">学分互认</th>
+                <th data-options="field:'t9'" style="width:5%;">学费</th>
+                <th data-options="field:'t0'" style="width:10%;">费用状态</th>
+            </tr>
+            </thead>
+        </table>
+    </div></br>
+<div>
+    <span  style="padding:0px;font-family:宋体 ;font-size:15px" >学费合计：490元</span>
+    <a href="#"><img src="1.jpg" width="100" height="50"></a>
+</div>
+</div>
+</body>
+
+<script>
+
+
+    $('#tt').datagrid({
+        singleSelect: true,
+        rowNumbers: "true",//显示行号
+        //pagination: "true",//分页
+        //remoteSort: false,//对本地数据进行排序
+        fitColumns:true,//自适应表格大小
+        //collapsible: true, //隐藏按钮
+        frozenColumns: [[{ field: "chk", "checkbox": true}]],//单选框
+        url:'course',
+    });
+
+</script>
+</html>

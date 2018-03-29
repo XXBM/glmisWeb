@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<script type="text/javascript" src="../static/isFile/index.js"></script>
+<style type="text/css">
+    label {
+        display: inline-block;
+    }
+
+    .information {
+        float: left;
+        display: inline;
+    }
+</style>
+<body>
+<div>
+    <!--折叠面板-->
+    <div id="accordion" class="easyui-accordion" style=" width:1166px;border: none">
+        <div title=""/>
+        <div id="tjcx" title="查询" data-options="iconCls:'icon-search'" style="overflow:auto;padding:10px;">
+
+            <label>出生日期：</label>
+            <input id="Employee_startBirth_dbox" class="easyui-datebox" style="width:120px"/>
+            &nbsp;<label>至</label>&nbsp;
+            <input id="Employee_endBirth_dbox" class="easyui-datebox" style="width:120px"/>
+            <label>性别：</label>
+            <input id="Employee_sex_cbox" class="easyui-combobox" style="width:120px"/>
+            <label>民族：</label>
+            <input id="Employee_nation_cbox" class="easyui-combobox" style="width:120px"/>
+            <label>部门：</label>
+            <input id="Employee_department_cbox" class="easyui-combobox" style="width:120px"/>
+            <label>是否华侨：</label>
+            <input id="Employee_overseasChineseOrNot_cbox" class="easyui-combobox"
+                   style="width:120px"/><br/><br/>
+            <label>政治面貌：</label>
+            <input id="Employee_politicalParty_cbox" class="easyui-combobox" style="width:120px"/>
+            <label>学位：</label>
+            <input id="Employee_academicDegree_cbox" class="easyui-combobox" style="width:120px"/>
+            <label>职称：</label>
+            <input id="Employee_professionalTitle_cbox" class="easyui-combobox" style="width:120px"/>
+            <label>执业资格：</label>
+            <input id="Employee_practisingCertification_cbox" class="easyui-combobox" style="width:120px"/>
+            <label>是否国内访学：</label>
+            <input id="Employee_domesticOrNot_cbox" class="easyui-combobox" style="width:120px"/>
+            <label>学术会议：</label>
+            <input id="Employee_academicConference_cbox" class="easyui-combobox" style="width:120px"/><br/><br/>
+            <label>访问学者资助：</label>
+            <input id="Employee_sponsor_cbox" class="easyui-combobox" style="width:120px"/>
+            <label>统计截止日期时间：</label>
+            <input id="Employee_endDate_dbox" class="easyui-datebox" style="width:120px"/>
+            <a href="#" id="Employee_select_linkbutton" class="easyui-linkbutton" iconCls="icon-search"
+               plain="true" onclick="searchEmployee()" style="float: right">查询</a>
+            <a href="#" id="Employee_exportExcel_linkbutton" class="easyui-linkbutton" iconCls="icon-print"
+               plain="true" onclick="exportExcel()" style="float: right">导出为excel</a>
+
+        </div>
+        <div title=""/>
+    </div>
+    <!--员工信息-->
+    <div title="人事查询">
+        <table id="employeeTable" class="easyui-datagrid" data-options="nowrap:false"/>
+    </div>
+</div>
+<script type="text/javascript" th:src="@{/jsFile/tjcx.js}"></script>
+</body>
+</html>

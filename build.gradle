@@ -1,0 +1,58 @@
+buildscript {
+	ext {
+		springBootVersion = '1.4.1.RELEASE'
+	}
+	repositories {
+//		使用Maven（）的容器获取依赖
+		mavenCentral()
+//		mavenLocal()会从本地Maven缓存中获取jar包
+//		mavenLocal()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'war'
+
+//可执行jar包的名字和版本号
+war {
+	baseName = 'glmis'
+	version = '0.0.1-SNAPSHOT'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	compile fileTree(include: ['*.jar'], dir: 'libs')
+	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework.boot:spring-boot-starter-aop')
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-jdbc')
+	compile('org.springframework.boot:spring-boot-starter-mail')
+	compile('org.springframework.boot:spring-boot-starter-mobile')
+	compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.springframework.boot:spring-boot-starter-social-linkedin')
+	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-web-services')
+	compile('org.seleniumhq.selenium:selenium-java')
+	compile('org.testng:testng:6.8.17')
+
+
+	/**excel 或 word 导入导出*/
+	compile('org.apache.poi:poi:3.14')
+	compile('org.apache.poi:poi-ooxml:3.14')
+//	/**Spring Session  参考网址：http://www.infoq.com/cn/articles/Next-Generation-Session-Management-with-Spring-Session */
+//	compile('org.springframework.session:spring-session')
+	/**缓存机制*/
+	//compile('org.springframework.boot:spring-boot-starter-cache')
+	runtime('mysql:mysql-connector-java')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}

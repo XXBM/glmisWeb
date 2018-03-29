@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生在线报名</title>
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css"/>
+</head>
+<body>
+<span  style="padding:0px;font-family:宋体 ;font-size:15px" >辅修系统>学生>在线报名</span></br></br>
+<div style="padding-left: 20%">
+    <table><tr>
+        <td>专业选择:
+        <select class="easyui-combobox" style="width:300px;height:30px" editable="false">
+            <option value="ar">工程造价</option>
+            <option value="ar" selected="selected">工程管理</option>
+            <option value="ar">信息系统与信息管理</option>
+            <option value="ar">土木管理</option>
+            <option value="ar">……</option>
+        </select></td>
+        <td>
+            所属学科门类
+            <input class="easyui-textbox" type="text" style="width:300px;height:30px;" readonly="readonly" data-options="prompt:'管理学'">
+        </td>
+    </tr></table>
+    </div></br></br>
+<p  style="font-family:宋体 ;font-size:15px;text-align: center" >当前用户基本信息:</p></br></br>
+
+<div>
+
+    <table cellSpacing="10px" align="center" border-left="1px">
+        <tr>
+            <td style="width:80px;">姓名:</td><!--readonly为不可修改-->
+            <td><input class="easyui-textbox" type="text" style="width:50px;height:30px" readonly="readonly" data-options="prompt:'张三'"></td>
+            <td style="width:80px">性别:</td>
+            <td><input class="easyui-textbox" type="text" style="width:30px;height:30px" readonly="readonly" data-options="prompt:'男'"></td>
+            <td style="width:80px">出生日期:</td>
+            <td><input class="easyui-textbox" type="text" style="width:100px;height:30px" readonly="readonly" data-options="prompt:'1996年1月1日'"></td>
+        </tr>
+        <tr>
+        <td style="width:80px;">学号:</td>
+        <td><input class="easyui-textbox" type="text" style="width:100px;height:30px;" readonly="readonly" data-options="prompt:'201502102222'"></td>
+        <td style="width:80px;" >所在班级:</td>
+        <td><input class="easyui-textbox" type="text" style="width:100px;height:30px"  readonly="readonly" data-options="prompt:'测绘151'"></td>
+        </tr>
+        <tr>
+            <td style="width:80px;">学生所在学院:</td>
+            <td><input class="easyui-textbox" type="text" style="width:100px;height:30px;" readonly="readonly" data-options="prompt:'土木工程学院'"></td>
+            <td style="width:80px;" >主修专业:</td>
+            <td><input class="easyui-textbox" type="text" style="width:100px;height:30px"  readonly="readonly" data-options="prompt:'测绘工程'"></td>
+        </tr>
+        <tr>
+            <td style="width:160px;">主修专业所属学科门类:</td>
+            <td><input class="easyui-textbox" type="text" style="width:150px;height:30px;" readonly="readonly" data-options="prompt:'工学'"></td>
+            <td style="width:160px;" >主修专业所属专业类:</td>
+            <td><input class="easyui-textbox" type="text" style="width:150px;height:30px"  readonly="readonly" data-options="prompt:'测绘类'"></td>
+        </tr>
+        <tr>
+            <td >拟申请辅修专业:</td>
+            <td><input class="easyui-textbox" type="text" style="width:150px;height:30px;" readonly="readonly" data-options="prompt:'工程造价'"></td>
+            <td  >辅修专业所属学院:</td>
+            <td><input class="easyui-textbox" type="text" style="width:150px;height:30px"  readonly="readonly" data-options="prompt:'管理工程学院'"></td>
+        </tr>
+        <tr>
+            <td >辅修专业所属门类:</td>
+            <td><input class="easyui-textbox" type="text" style="width:150px;height:30px;" readonly="readonly" data-options="prompt:'管理学'"></td>
+            <td >辅修专业所属专业类:</td>
+            <td><input class="easyui-textbox" type="text" style="width:150px;height:30px"  readonly="readonly" data-options="prompt:'管理科学与工程类'"></td>
+        </tr>
+        <tr>
+            <td style="width:120px;" rowspan="2">学生本人联系方式:</td>
+            <td style="width:80px;" >电话:</td>
+            <td><input class="easyui-textbox" type="text" style="width:120px;height:30px"  readonly="readonly" data-options="prompt:'17865311111'"></td>
+
+        </tr>
+        <tr>
+            <td style="width:80px;" >E-mail:</td>
+            <td><input class="easyui-textbox" type="text" style="width:120px;height:30px"  readonly="readonly" data-options="prompt:'111111111@qq.com'"></td>
+        </tr>
+
+    </table>
+</div>
+</body>
+</html>

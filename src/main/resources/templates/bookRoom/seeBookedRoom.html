@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Title</title>
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js" th:src="@{easyui/jquery.min.js}"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js" th:src="@{easyui/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js" th:src="@{easyui/locale/easyui-lang-zh_CN.js}"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css" th:href="@{easyui/themes/default/easyui.css}"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css" th:href="@{easyui/themes/icon.css}"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/color.css"  th:href="@{easyui/themes/color.css}"/>
+</head>
+<body>
+
+<h1>查看已经借用信息</h1>
+<div id="seeBooked" class="easyui-panel" title="已经预约信息"  style="width:700px;height:300px;padding:10px;">
+    <div id="seeRoomDg" class="easyui-datagrid"  style="width:100%;height:100%;"></div>
+</div>
+
+<script>
+    function basePath(){
+        var curWwwPath = window.document.location.href;
+        var pathName =  window.document.location.pathname;
+        var pos = curWwwPath.indexOf(pathName);
+        var localhostPaht = curWwwPath.substring(0,pos);
+        var projectName = pathName.substring(0,pathName.substr(1).indexOf('1')+1);
+        return (localhostPaht + projectName);
+    }
+    //预约房间的datagrid属性
+    $('#seeRoomDg').datagrid({
+        url: basePath() + '/displayAppointmentInf',
+        method:'get',
+        fit: true,
+        singleSelect: true,
+        rowNumbers: true,//显示行号
+        pagination: true,//分页
+        fitColumns: true,//自适应表格大小
+        columns: [[
+            {field: 'id', title: '',hidden:true},
+            {field: 'day', title: '借用日期', width: 100, align: 'center'},
+            {field: 'begin', title: '开始时间', width: 100, align: 'center',
+                formatter:function(value,rec){
+                    return rec.time.begin;
+                }
+            },
+            {field: 'end', title: '结束时间', width: 100, align: 'center',
+                formatter:function(value,rec){
+                    return rec.time.end;
+                }
+            },
+             {field: 'name', title: '借用信息', width: 100, align: 'center',
+                 formatter:function(value,rec){
+                     if (rec.bookingAdress!=null)
+                     return rec.bookingAdress.name;
+                     else(rec.bookingEquipments!=null)
+                         return rec.bookingEquipments.name;
+                 }
+             },
+             {field: 'userName', title: '借用人', width: 100, align: 'center',
+                 formatter:function(value,rec){
+                     return rec.user.userName;
+                 }},
+
+        ]],
+    });
+    var roomPager = $('#seeRoomDg').datagrid('getPager');
+    $(roomPager).pagination({
+        showPageList:false,
+        beforePageText: '第',//页数文本框前显示的汉字
+        afterPageText: '页    共 {pages} 页',
+        displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+        onBeforefresh:function () {
+            $(this).pagination('loading');
+            alert('before refresh');
+            $(this).pagination('loaded');
+
+        }
+    });
+</script>
+</body>
+</html>

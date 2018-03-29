@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>横向项目级别</title>
+</head>
+<body>
+<script>
+    var editRow = undefined;//undefined用于指示变量尚未用单等号进行赋值
+    var rowData = undefined;
+    //获取行
+    function getRow(dat) {
+        var rows = $(dat).datagrid('getRows'); //获取当前页的所有行
+        rowData = rows[editRow]; //行数据
+    }
+    //jquery.validatebox.js  扩展  正则表达式
+    $.extend($.fn.validatebox.defaults.rules, {
+        //数字
+        Number: {
+            validator: function (value) {
+                var reg = /^[0-9]*$/;
+                return reg.test(value);
+            },
+            message: '此处只能输入数字'
+        },
+    })
+    //表格信息显示
+    $('#projectFundedByPrivateSectorRankTable').datagrid({
+        toolbar:'#toolbar',
+        width:800,
+        height:600,
+        url:basePath()+'/findAllProjectFundedByPrivateSectorRanks',
+        method:'get',
+        singleSelect:true,
+        rowNumbers:true,
+        fitColumns:true,
+        frozenColumns:[[{field:"chk","checkbox":true}]],
+        columns:[[
+            {field:'id',title:'id',hidden:true},
+            {field:'no',title:'编号',width:200,
+                editor:{
+                    type:'validatebox',
+                    options:{
+                        required:true,
+                        validType:'Number',
+                        missingMessage:'该字段不能为空'
+                    }
+                }},
+            {field:'description',title:'横向项目级别',width:200,
+                editor:{
+                    type:'validatebox',
+                    options:{
+                        required:true,
+                        missingMessage:'该字段不能为空'
+                    }
+                }}
+        ]],
+        toolbar: [{
+            id:'ProjectFundedByPrivateSectorRank_add_btn',
+            text: '添加', iconCls: 'icon-add',
+            handler: function () {
+                addOpe('#projectFundedByPrivateSectorRankTable');
+            }
+        }, '-', {
+            id:'ProjectFundedByPrivateSectorRank_remove_btn',
+            text: '删除', iconCls: 'icon-remove',
+            handler: function () {
+                deleteOpe('#projectFundedByPrivateSectorRankTable', basePath() + '/deleteProjectFundedByPrivateSectorRank?ids=');
+            }
+        }, '-', {
+            id:'ProjectFundedByPrivateSectorRank_edit_btn',
+            text: '修改', iconCls: 'icon-edit',
+            handler: function () {
+                updateOpe('#projectFundedByPrivateSectorRankTable');
+            }
+        }, '-', {
+            id:'ProjectFundedByPrivateSectorRank_save_btn',
+            text: '保存', iconCls: 'icon-save',
+            handler: function () {
+                saveOpe('#projectFundedByPrivateSectorRankTable');
+            }
+        }, '-', {
+            id: 'ProjectFundedByPrivateSectorRank_redo_btn',
+            text: '撤销', iconCls: 'icon-redo',
+            handler: function () {
+                cancelOpe('#projectFundedByPrivateSectorRankTable');
+            }
+        }],
+        onAfterEdit: function (rowIndex, rowData, changes) {
+            endEditOpe(rowData, basePath() + '/addProjectFundedByPrivateSectorRank', basePath() + '/updateProjectFundedByPrivateSectorRank', '#projectFundedByPrivateSectorRankTable');
+        },
+        onCancelEdit: function (rowIndex, rowData) {
+            editRow = undefined;
+        },
+        //双击一行保存修改
+        onDblClickRow: function (rowIndex, rowData) {
+            //先判断是否有开启编辑的行，如果有则把开户编辑的那行结束编辑
+            if (editRow != undefined) {
+                $("#projectFundedByPrivateSectorRankTable").datagrid('endEdit', editRow);
+            } else {
+                dblClickOpe(rowData, rowIndex, '#projectFundedByPrivateSectorRankTable');
+            }
+        },
+        pagination: "true",//分页
+    });
+
+
+</script>
+<div id="projectFundedByPrivateSectorRank_div">
+<table id="projectFundedByPrivateSectorRankTable" class="easyui-datagrid">
+</table>
+</div>
+</body>
+</html>

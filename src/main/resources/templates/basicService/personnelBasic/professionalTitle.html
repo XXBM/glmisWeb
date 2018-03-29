@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script type="text/javascript" src="../../../static/easyui/jquery.min.js" th:src="@{easyui/jquery.min.js}"></script>
+    <script type="text/javascript" src="../../../static/easyui/jquery.easyui.min.js" th:src="@{easyui/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" src="../../../static/easyui/jquery.easyui2.min.js" th:src="@{easyui/jquery.easyui2.min.js}"></script>
+    <script type="text/javascript" src="../../../static/easyui/locale/easyui-lang-zh_CN.js" th:src="@{easyui/locale/easyui-lang-zh_CN.js}"></script>
+    <link rel="stylesheet" type="text/css" href="../../../static/easyui/themes/default/easyui.css" th:href="@{easyui/themes/default/easyui.css}"/>
+    <link rel="stylesheet" type="text/css" href="../../../static/easyui/themes/icon.css" th:href="@{easyui/themes/icon.css}"/>
+    <link rel="stylesheet" type="text/css" href="../../../static/easyui/themes/color.css" th:href="@{easyui/themes/color.css}"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>职称维护</title>
+</head>
+<body>
+<script>
+    var rowDate=undefined;
+    var editRow=undefined;
+    var beingInsertedRow=undefined;
+    //jquery.validatebox.js  扩展  正则表达式
+    $.extend($.fn.validatebox.defaults.rules, {
+        //数字
+        Number: {
+            validator: function (value) {
+                var reg = /^[0-9]*$/;
+                return reg.test(value);
+            },
+            message: '此处只能输入数字'
+        },
+    })
+    //表格信息显示
+    $('#professionalTitleTable').datagrid({
+        toolbar:'#toolbar',
+        width:800,
+        height:600,
+        url:basePath()+'/findAllPostNames',
+        method:'get',
+        singleSelect:true,
+        rowNumbers:true,
+        fitColumns:true,
+        frozenColumns:[[{field:"chk","checkbox":true}]],
+        columns:[[
+            {field:'id',title:'id',hidden:true},
+            {field:'no',title:'编号',width:200,
+                editor:{
+                    type:'validatebox',
+                    options:{
+                        required:true,
+                        validType:'Number',
+                        missingMessage:'该字段不能为空'
+                    }
+                }},
+            {field:'description',title:'职称',width:200,
+                editor:{
+                    type:'validatebox',
+                    options:{
+                        required:true,
+                        missingMessage:'该字段不能为空'
+                    }
+                }}
+        ]],
+        pagination:true,
+        onAfterEdit:function (rowIndex, rowDate, changes) {
+            endEditOpe(rowDate,basePath()+'/addProfessionalTitle',basePath()+'/updateProfessionalTitle','#professionalTitleTable')
+        },
+        onCancelEdit:function (rowIndex, rowDate) {
+            editRow=undefined;
+        },
+        onDblClickRow: function (rowIndex, rowData) {
+            if (editRow != undefined) {
+                $("#professionalTitleTable").datagrid('endEdit', editRow);
+            } else {
+                dblClickOpe(rowData, rowIndex, '#professionalTitleTable');
+            }
+        },
+    })
+
+    //添加
+    function professionalTitleaddRecord(){
+        if(editRow!=undefined){
+            $.messager.alert('消息提示','请先保存正在编辑的行','info')
+        }else {
+            $('#professionalTitleTable').datagrid('insertRow',{
+                index:0,
+                row:{}
+            })
+            $('#professionalTitleTable').datagrid('beginEdit',0)
+            editRow=0;
+            beingInsertedRow=0;
+        }
+    }
+
+
+
+
+    //修改
+    function professionalTitleeditRecord() {
+        if(editRow!=undefined){
+            $.messager.alert('消息提示','请先保存正在编辑的行','info')
+        }else{
+            var rows=$('#professionalTitleTable').datagrid('getSelections');
+            if(rows.length>0){
+            var rowDate=$('#professionalTitleTable').datagrid('getSelected');
+            var index=$('#professionalTitleTable').datagrid('getRowIndex',rows[0]);
+            $('#professionalTitleTable').datagrid('beginEdit',index);
+            editRow=index;
+        }else
+            $.messager.alert('提示','请选择要修改的行','info')
+
+        }
+    }
+
+
+
+    //删除
+    function professionalTitleremoveRecord() {
+        if(editRow==undefined){
+            var rows = $('#professionalTitleTable').datagrid('getSelections');
+            if(rows.length>0){
+                $.messager.confirm('提示','你确定要删除吗？',
+                function (r) {
+                    if(r){
+                    var ids=[];
+                    ids.push(rows[0].id);
+                    $.deleteAjax(basePath()+'/deleteProfessionalTitle?id='+ids.join(','),'#professionalTitleTable')
+                }})
+            }else {
+                $.messager.alert('提示','请选择要删除的行','info')
+            }
+        }else
+            $.messager.alert('消息提示','存在正在编辑的行，请先保存或撤销','info');
+    }
+
+
+    
+    //保存
+    function professionalTitlesaveRecord(){
+        $('#professionalTitleTable').datagrid('endEdit',editRow);
+        if(editRow!=undefined){
+            $.messager.alert('消息提示','请检查输入信息，查看红色字段','info')
+        }
+    }
+
+
+    //撤销
+    function professionalTitleredoRecord() {
+        //取消添加新行，并将新插入的该行删去
+        if (beingInsertedRow == 0) {
+            $('#professionalTitleTable').datagrid('deleteRow', beingInsertedRow);
+            beingInsertedRow = undefined;//插入行重新变为未定义
+            editRow = undefined;
+        }
+        //取消当前编辑行把当前编辑行undefined回滚改变的数据,取消选择的行
+        if (editRow != undefined) {
+            $('#professionalTitleTable').datagrid('cancelEdit', editRow);
+        }
+
+    }
+
+
+
+
+</script>
+<!--professionalTitle类的表格-->
+<table id="professionalTitleTable" class="easyui-datagrid">
+</table>
+<div id="toolbar" style="padding: 5px;height: auto">
+    <div style="margin-bottom: auto">
+        <a href="###" class="easyui-linkbutton" iconCls="icon-add" plain="true" id="ProfessionalTitle_add_btn" onclick="professionalTitleaddRecord()">添加</a>
+        <a href="###" class="easyui-linkbutton" iconCls="icon-edit" plain="true" id="ProfessionalTitle_edit_btn" onclick="professionalTitleeditRecord()">修改</a>
+        <a href="###" class="easyui-linkbutton" iconCls="icon-remove" plain="true" id="ProfessionalTitle_remove_btn" onclick="professionalTitleremoveRecord()">删除</a>
+        <a href="###" class="easyui-linkbutton" iconCls="icon-save" plain="true" id="ProfessionalTitle_save_btn" onclick="professionalTitlesaveRecord()">保存</a>
+        <a href="###" class="easyui-linkbutton" iconCls="icon-redo" plain="true" id="ProfessionalTitle_redo_btn" onclick="professionalTitleredoRecord()">撤销</a>
+    </div>
+</div>
+
+</body>
+</html>
