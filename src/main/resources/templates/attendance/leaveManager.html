@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:fit="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>请假管理</title>
+</head>
+<body>
+
+<style type="text/css">
+
+    #leaveManagerLeft {
+        float: left;
+        height: 420px;
+    }
+
+    #staff {
+        float: left;
+        width: 270px;
+    }
+
+    #leaves {
+        float: left;
+        height: 420px;
+    }
+
+</style>
+<!--这个table不起作用，只是为了让其他datagrid正常显示-->
+<div class="easyui-dialog" closed="true">
+    <table id="noUse" class="easyui-datagrid">
+        <script>
+            $(function () {
+                $('#noUse').datagrid({});
+            });
+        </script>
+    </table>
+    <table id="partyInfo" class="easyui-datagrid" th:hidden="true"/>
+</div>
+<!--选择部门  mode:'remote':从服务器获取时就设为remote -->
+<div id="leaveManagerLeft">
+    <div id="selectdepartment">
+        <br/>
+        教研室：<br/>
+        <input id="Department_select_combobox" class="easyui-combobox" name="selectDepartment"
+               value="请选择教研室" th:value="请选择教研室"
+               data-options="
+                        required:true,
+                        method:'get',
+                        mode:'remote',
+                        url:basePath()+'/findAllDepartment',
+                        valueField:'id',
+                        textField:'departmentName',
+                        onSelect:function(rec){
+                            var url = basePath()+'/displayEmpByDep?id='+rec.id;
+                            $('#staffTable').datagrid('reload',url);
+                            var leaveUrl = basePath() + '/displayLeaveByEmp?id=' + rec.id;
+                            $('#Leave').datagrid('reload', leaveUrl);
+                            var Text =$('#Department_select_combobox').combobox('getText');
+                            if(Text=='全部'){
+                                var url = basePath()+'/displayAllEmployeeName';
+                                $('#staffTable').datagrid('reload',url);
+                            }
+                        }
+                    "
+        />
+        <!--员工列表-->
+        <table id="staffTable" class="easyui-datagrid">
+        </table>
+    </div>
+
+</div>
+<!--请假信息-->
+<div id="leaves">
+    <table id="Leave" class="easyui-datagrid"/>
+</div>
+
+<!--js-->
+<script type="text/javascript" src="../static/isFile/index.js" th:src="@{/jsFile/leaveManager.js}"></script>
+</body>
+</html>

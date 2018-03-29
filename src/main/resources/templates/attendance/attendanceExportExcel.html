@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:fit="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>生成人事处报表</title>
+</head>
+<body>
+<div id="Attendance_exportExcel_div" style="padding-left: 20px">
+    <br/><br/>
+    <input id="Attendance_startTime_dbox" class="easyui-datebox" style="width:100px"/>
+    至：<input id="Attendance_endTime_dbox" class="easyui-datebox" style="width:100px"/>
+    <br/><br/>
+    <a href="#" id="Attendance_exportExcel_linkbutton" class="easyui-linkbutton" iconCls="icon-print" plain="true" onclick="attendanceExportExcel()" style="float: left">导出人事处报表</a>
+</div>
+<script type="text/javascript" src="../static/isFile/index.js" th:src="@{/jsFile/attendanceExportExcel.js}"></script>
+</body>
+</html>

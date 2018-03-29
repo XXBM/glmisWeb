@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="testGroup" parallel="false">
+    <test name="test">
+        <groups>
+            <run>
+                <include name="2"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.glmis.UITest.personnel.EmployeeTest">
+                <methods>
+                    <exclude name="testDeleteEmployee"/>
+                    <exclude name="testAddEmployee"/>
+                    <exclude name="testQueryEmployee"/>
+                    <include name="testDeleteEmployee"/>
+                    <exclude name="testEditEmployee"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

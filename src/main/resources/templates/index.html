@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>管理工程学院综合信息管理平台</title>
+    <!--引入jQuery核心库-->
+    <script type="text/javascript" src="../../static/easyui/jquery-3.1.1.min.js" th:src="@{easyui/jquery-3.1.1.min.js}"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui-1.5.1.min.js" th:src="@{easyui/jquery.easyui-1.5.1.min.js}"></script>
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js" th:src="@{easyui/locale/easyui-lang-zh_CN.js}"></script>
+    <script type="text/javascript" src="../static/isFile/index.js" th:src="@{/jsFile/index.js}"></script>
+    <!--共用的一个js文件-->
+    <script type="text/javascript" src="../static/isFile/index.js" th:src="@{/jsFile/crud.js}"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.form.js" th:src="@{easyui/jquery.form.js}"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css" th:href="@{easyui/themes/default/easyui.css}"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css" th:href="@{easyui/themes/icon.css}"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/color.css"  th:href="@{easyui/themes/color.css}"/>
+    <!--自定义的glmis.css文件-->
+    <link rel="stylesheet" type="text/css" th:href="@{/cssFile/glmis.css}"/>
+<script type="text/javascript">
+
+</script>
+</head>
+<body class="easyui-layout">
+<div data-options="region:'north',title:'header',split:false,noheader:true" style="height:110px;">
+    <div style="float: right;padding-top: 6px;padding-right: 10px;">
+        <div id="showtimes" style="float:right;margin-bottom: 10px;">
+            <script language="javascript">show_cur_times();</script>
+        </div>
+        <div style="float:right;clear: both">
+            <div style="float: left"><h1 id="time"></h1></div>
+            <div style="float:left"><h1 th:inline="text">[[${#httpServletRequest.remoteUser}]]!</h1></div>
+            <div style="float:right;padding-top:20px;padding-left: 20px;">
+                <form th:action="@{/logout}" method="post"><input type="submit" value="退出"/></form>
+            </div>
+        </div>
+    </div>
+</div>
+<div data-options="region:'south',title:'footer',split:true,noheader:true" style="height:35px;line-height:30px;text-align:center;">
+    管理学院--行政系统
+</div>
+<div data-options="region:'west',title:'导航',split:true,iconCls:'icon-world'" style="width:180px;padding:10px;">
+    <ul id="nav" class="easyui-tree" ></ul>
+</div>
+<div data-options="region:'center'" style="overflow:hidden;">
+    <div id="tabs">
+        <div title="起始页" iconCls="icon-house" style="padding:0 10px;display:block;">
+            欢迎来到行政管理系统！
+        </div>
+    </div>
+</div>
+</body>
+</html>

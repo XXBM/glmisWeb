@@ -1,0 +1,88 @@
+@startuml
+abstract class Attendance{
+    Long id
+    Employee employee
+    AttendanceSummary ats
+}
+class AttendanceSummary{
+    Long id
+    String attendanceName
+    Calendar attendanceTime
+    Employee attendanceManager
+    String minutes
+    Collection<Attendance> atts
+    Collection<Employee> candidates
+}
+
+
+Attendance <--> AttendanceSummary
+Attendance <--> Employee
+AttendanceSummary <--> Employee
+AttendanceSummary --> Employee
+
+
+abstract class Absence{
+    String remarks
+}
+class Presence{
+    PresenceDescription pd
+}
+abstract class SchoolAbsence{
+}
+class UniversityAbsence{
+    UniversityAbsenceDescription ud
+}
+class PrivateLeave{
+    PrivateLeaveDescription pld
+}
+class BusinessLeave{
+    BusinessLeaveDescription bld
+}
+class NeglectWork{
+    NeglecWorkDescription nwd
+}
+
+class Employee{
+    Collection<Attendance> atts
+    Collection<AttendanceSummary> ass
+    Collection<Leave> ls
+}
+
+abstract class AbstractDescription{
+    Long id
+    String description
+}
+
+Attendance <|-- Presence
+Attendance <|-- Absence
+
+Absence <|-- SchoolAbsence
+Absence <|-- UniversityAbsence
+
+SchoolAbsence<|-- PrivateLeave
+SchoolAbsence<|-- BusinessLeave
+SchoolAbsence<|-- NeglectWork
+
+AbstractDescription<|-- PrivateLeaveDescription
+AbstractDescription<|-- BusinessLeaveDescription
+AbstractDescription<|-- NeglecWorkDescription
+AbstractDescription<|-- UniversityAbsenceDescription
+AbstractDescription<|-- PresenceDescription
+
+PrivateLeave --> PrivateLeaveDescription
+BusinessLeave-->BusinessLeaveDescription
+NeglectWork-->NeglecWorkDescription
+UniversityAbsence-->UniversityAbsenceDescription
+Presence-->PresenceDescription
+
+Leave <--> Employee
+
+class Leave{
+    Long id
+    Calendar startTime
+    Calendar endTime
+    Calendar realTime
+    String reason
+    Employee employee
+}
+@enduml

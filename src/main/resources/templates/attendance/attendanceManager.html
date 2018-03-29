@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:fit="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>考勤管理</title>
+</head>
+<body>
+<div>
+<!--AttendanceSummary(那张纸)-->
+<div id="attendanceSummary_div" style="float: left">
+    <table id="AttendanceSummary_table" class="easyui-datagrid"/>
+</div>
+<!--AttendanceSummary的工具栏-->
+<div id="AttendanceSummaryToolbar" style="padding:5px;height:auto">
+    <!--折叠面板-->
+    <div id="AttendanceSummary_accordion" class="easyui-accordion" style=" width:300px;border: none">
+            <!--为了实现面板默认是关闭的，因为如果有多个面板默认打开第一个-->
+            <div id="AttendanceSummary_search_none" title=""/>
+            <div id="AttendanceSummary_search" title="查询" data-options="iconCls:'icon-search'" style="overflow:auto;padding:10px;">
+                <div id="AttendanceSummary_search_div">
+                    时间：<input id="AttendanceSummary_startTime_datebox" class="easyui-datebox" style="width:90px"/>
+                    至：<input id="AttendanceSummary_endTime_datebox" class="easyui-datebox" style="width:90px"/><br/><br/>
+                    <a href="#" id="AttendanceSummary_search_btn" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="searchAttendanceSummary()" style="float: right">查询</a>
+                </div>
+            </div>
+        </div>
+    <div id="AttendanceSummary_toolbar_btn" style="padding:5px;height:auto">
+        <div style="margin-bottom:5px">
+            <a id="AttendanceSummary_add_linkbutton" href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+               onclick="AttendanceSummaryAddRecord()">添加</a>
+            <a id="AttendanceSummary_edit_linkbutton" href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
+               onclick="AttendanceSummaryEditRecord()">编辑</a>
+            <a id="AttendanceSummary_remove_linkbutton" href="#" class="easyui-linkbutton" iconCls="icon-cut" plain="true"
+               onclick="AttendanceSummaryMoveRecord()">删除</a>
+        </div>
+    </div>
+</div>
+<!--&lt;!&ndash;Attendance(考勤记录)&ndash;&gt;-->
+<!--<div>-->
+    <!--<table id="Attendance_table" class="easyui-datagrid"/>-->
+<!--</div>-->
+<div id="attendance_information" style="height: 500px;float: left">
+    <div id="attendance_tabs" class="easyui-tabs" style="width:700px;" fit="true">
+        <div id="candidate_tab" title="候选人">
+            <table id="candidate_table" class="easyui-datagrid" data-options="nowrap:false"/>
+        </div>
+        <div id="presence_tab" title="出勤">
+            <table id="presence_table" class="easyui-datagrid" data-options="nowrap:false"/>
+        </div>
+        <div id="businessLeave_tab" title="公假">
+            <table id="businessLeave_table" class="easyui-datagrid" data-options="nowrap:false"/>
+        </div>
+        <div id="neglectWork_tab" title="旷工">
+            <table id="neglectWork_table" class="easyui-datagrid" data-options="nowrap:false"/>
+        </div>
+        <div id="privateLeave_tab" title="事假">
+            <table id="privateLeave_table" class="easyui-datagrid" data-options="nowrap:false"/>
+        </div>
+        <div id="universityAbsence_tab" title="学校缺勤">
+            <table id="universityAbsence_table" class="easyui-datagrid" data-options="nowrap:false"/>
+        </div>
+    <!--&lt;!&ndash;Attendance的工具栏&ndash;&gt;-->
+    <!--<div id="AttendanceToolbar" style="padding:5px;height:auto">-->
+        <!--&lt;!&ndash;折叠面板&ndash;&gt;-->
+        <!--<div id="Attendance_accordion" class="easyui-accordion" style=" width:860px;border: none">-->
+            <!--&lt;!&ndash;为了实现面板默认是关闭的，因为如果有多个面板默认打开第一个&ndash;&gt;-->
+            <!--<div id="Attendance_search_none" title=""/>-->
+            <!--<div id="Attendance_search" title="查询" data-options="iconCls:'icon-search'" style="overflow:auto;padding:10px;">-->
+                <!--<div id="Attendance_search_div">-->
+                    <!--教研室：-->
+                    <!--<input id="Attendance_department_combobox" class="easyui-combobox" style="width: 120px"/>-->
+                    <!--考勤状态:-->
+                    <!--<input id="Attendance_description_combobox" class="easyui-combobox" style="width:120px"/><br/><br/>-->
+                    <!--<a href="#" id="Attendance_search_btn" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="searchAttendance()" style="float: right">查询</a>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div id="Attendance_btn_toolbar" style="margin-bottom:5px">-->
+            <!--<a href="#" id="Attendance_edit_btn" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit('#Attendance_table')">修改</a>-->
+            <!--<a href="#" id="Attendance_save_btn" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="save('#Attendance_table')">确定</a>-->
+            <!--<a href="#" id="Attendance_cyancel_btn" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="cancel('#Attendance_table')">取消</a>-->
+        <!--</div>-->
+        <!--</div>-->
+        
+    </div>
+</div>
+    <div id="description_div" style="float: left">
+        <table id="description_table" class="easyui-datagrid"/>
+    </div>
+<!--弹出框-->
+<div id="AttendanceSummary_Dialg" class="easyui-dialog" th:scrolling="yes" style="width:330px;height:220px;padding:10px 20px;"
+         closed="true" buttons="#AttendanceSummaryDialg-buttons">
+        <form id="AttendanceSummary_form" method="post">
+            <div class="fitem">
+                <input id="Attendance_id_validatebox" name="id" class="easyui-validatebox" hidden="true"/>
+            </div><br/><br/>
+            <div id="AttendanceSummary_attendanceTime_div" class="fitem">
+                <label>
+                    考勤时间
+                </label>
+                <input id="Attendance_attendanceTime_dbox" name="attendanceTime" class="easyui-datebox" required="true" data-options="editable:false"/>
+            </div><br/><br/>
+            <div id="AttendanceSummary_attendanceName_div" class="fitem">
+                <label>
+                    考勤名称
+                </label>
+                <input id="Attendance_attendanceName_validatebox" name="attendanceName" class="easyui-validatebox"
+                       data-options="
+                          required:'true',
+                          missingMessage:'该字段不能为空',
+                    "
+                />
+            </div>
+        </form>
+    </div>
+<div id="AttendanceSummaryDialg-buttons">
+        <a id="AttendanceSummary_save_linkbutton" href="#" class="easyui-linkbutton" onclick="AttendanceSummarySaveRecord()" iconcls="icon-save">保存</a>
+        <a id="AttendanceSummary_cancel_linkbutton" href="#" class="easyui-linkbutton" onclick="javascript:$('#AttendanceSummary_Dialg').dialog('close')"
+           iconcls="icon-cancel">取消</a>
+    </div>
+</div>
+<script type="text/javascript" src="../static/isFile/index.js" th:src="@{/jsFile/attendanceManager.js}"></script>
+</body>
+</html>

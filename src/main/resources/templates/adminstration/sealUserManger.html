@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用章-管理员</title>
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/color.css">
+    <!--<link rel="stylesheet" type="text/css" href="../statics/easyui/demo.css">-->
+
+
+</head>
+<body>
+<div class="easyui-panel" style="width:582px;height:600px">
+    <div style="margin-left:10px;">
+        <p><a href="#" style="text-decoration:none;color:#0000FF">行政管理>用章>管理员>执行</a>
+        </p>
+    </div>
+    <div style="margin-left:10px;">
+        <table id="manager" class="easyui-datagrid" width="552px" height="200px" data-options="">
+            <thead>
+            <tr align="center">
+                <th data-options="field:'time'" style="width:100px;">时间</th>
+                <th data-options="field:'content'" style="width:100px;">内容</th>
+                <th data-options="field:'reject'" style="width:80px;">驳回</th>
+                <th data-options="field:'execute'" style="width:200px;">执行</th>
+                <th data-options="field:'status'" style="width:70px;">状态</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr align="center">
+                <td>2014-9-18</td>
+                <td>学生证</td>
+                <td><input type="button" value="驳回" class="easyui-button" onclick="obj.reject()"></td>
+                <td><select width="150px">
+                    <option value="aaa">院章</option>
+                    <option value="bbb">教学科研办</option>
+                    <option value="aaa">学位评分委员会</option>
+                </select>
+                <input type="button" class="easyui-button" value="盖章">
+                </td>
+                <td>待处理</td>
+            </tr>
+            <tr align="center">
+                <td>2014-9-18</td>
+                <td>学生证</td>
+                <td><input type="button" value="驳回" class="easyui-button" onclick="obj.reject()"></td>
+                <td><select>
+                    <option value="aaa">院章</option>
+                    <option value="bbb">教学科研办</option>
+                    <option value="aaa">学位评分委员会</option>
+                </select>
+                <input type="button" class="easyui-button" value="盖章"></td>
+                <td>待处理</td>
+            </tr>
+            <tr align="center">
+                <td>2014-9-18</td>
+                <td>学生证</td>
+                <td></td>
+                <td></td>
+                <td>完成</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

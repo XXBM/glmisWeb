@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+</head>
+<body>
+<!--学历维护-->
+<!--educationQualification类对应的表格-->
+<table id="educationQualificationTable" class="easyui-datagrid">
+    <script type="text/javascript">
+        //定义全局变量（编辑行/插入行/行数据）
+        var editRow = undefined;//当前编辑的行，未定义的
+        var beingInsertedRow = undefined;
+        var rowData = undefined;
+        //基础路径
+        function basePath(){
+            //获取当前网址
+            var curWwwPath = window.document.location.href;
+            //获取主机地址之后的目录
+            var pathName =  window.document.location.pathname;
+            var pos = curWwwPath.indexOf(pathName);
+            //获取主机地址，如http://localhost:8080
+            var localhostPath = curWwwPath.substring(0,pos);
+            //获取带/的项目名
+            var projectName = pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+            //返回basepath
+            return (localhostPath + projectName);
+        }
+        <!--显示表格中的数据-->
+        $(function () {
+            <!--表格数据-->
+            $('#educationQualificationTable').datagrid({
+                title: '学历维护',
+                iconCls: 'icon-ok',
+                method: 'get',
+                url: basePath()+'/displayAllEduaction',
+                width: 760,
+                height: 300,
+                singleSelect: true,
+                //显示行号
+                rowNumbers: "true",
+                //设置是否对本地数据进行排序
+                remoteSort: false,
+                //自适应表格大小
+                fitColumns: true,
+                //单选框
+                frozenColumns: [[{field: "chk", "checkbox": true}]],
+                //关于列的设置
+                columns: [[
+                    {field: 'id', title: 'id', width: 70, align: 'center', hidden: 'ture'},
+                    {field:'no',title:'编号',width:70,align:'center',
+                        editor: {
+                            type: 'validatebox',
+                            options: {
+                                required: true,
+                                validType: 'Number',
+                                missingMessage: '该字段不能为空'
+                            }
+                        }
+                    },
+                    {field: 'description', title: '学历名称', width: 80, align: 'center',
+                        //可编辑
+                        editor: {
+                            type: 'validatebox',
+                            options: {
+                                required: true,
+                                missingMessage: '该字段不能为空'
+                            }
+                        }
+                    }
+                ]],
+                //工具栏，通过数组 定义工具栏
+                toolbar: '#educationToolbar',
+                //endEdit方法触发此事件后
+                onAfterEdit: function (rowIndex, rowData, changes) {
+                    //rowIndex：编辑行的索引，从 0 开始;rowData：编辑行对应的记录;changes：更改的字段/值对
+                    endEditOpe(rowData, basePath() + '/addEducationQualification', basePath() + '/updateEduactionQualification', '#educationQualificationTable');
+                },
+                //双击一行
+                onDblClickRow: function (rowIndex, rowData) {
+                    if (editRow != undefined) {
+                        $("#educationQualificationTable").datagrid('endEdit', editRow);
+                    } else {
+                        dblClickOpe(rowData, rowIndex, '#educationQualificationTable');
+                    }
+                },
+                onCancelEdit: function (rowIndex, rowData) {
+                    editRow = undefined;
+                },
+                //分页
+                pagination: "true"
+            });
+            //分页设置
+            //分页用的获取datagrid中的详细内容，后台只需要获取easyui自动提供pages和rows即可。
+            var p = $('#educationQualificationTable').datagrid('getPager');
+            $(p).pagination({
+                showPageList: false,
+                //页数文本框前显示的汉字
+                beforePageText: '第',
+                afterPageText: '页    共 {pages} 页',
+                displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+                //刷新之前？
+                onBeforefresh: function () {
+                    $(this).pagination('loading');
+                    $(this).pagination('loaded');
+                }
+            })
+        });
+        //增加操作
+        function addOpe(datagridId) {
+            //添加前先判断是否有开始编辑的行，
+            // 如果有就把那行结束编辑
+            if (editRow != undefined) {
+                $.messager.alert('消息提示', '请先保存修改', 'info');
+            } else {
+                //如果没有正在编辑的行，则在datagrid第一行插入一行是个待编辑的空行
+                $(datagridId).datagrid('insertRow', {
+                    //插入第0行
+                    index: 0,
+                    //空行
+                    row: {}
+                });
+                //将插入的那行开启编辑状态
+                $(datagridId).datagrid('beginEdit', 0);
+                //定义当前编辑的行为0
+                editRow = 0;
+                //定义当前正在插入的行为0
+                beingInsertedRow = 0;
+            }
+        }
+        //增加Ajax，ajax默认提交json数据
+        //关于msg：ajax为后台传递数据后，后台返回的内容即为msg
+        $.saveAjax = function (url, data, datagrid) {
+            return jQuery.ajax({
+                'type': 'POST',
+                'url': url,
+                'contentType': 'application/json',
+                'data': JSON.stringify(data),
+                'dataType': 'json',
+                success: function (msg) {
+                    if (msg.data == undefined) {
+                        $.messager.alert('消息提示', '添加成功', 'info');
+                        $(datagrid).datagrid('reload');//添加成功之后调用
+                    } else {
+                        $.messager.alert("操作提示", "操作失败！" + msg.data + "," + msg.message, "error");
+                        $(datagrid).datagrid('reload');
+                    }
+                },
+                error: function (msg) {
+                    $.messager.alert('消息提示', '添加失败', 'error');
+                }
+            });
+        };
+        //修改操作
+        function updateOpe(datagridId) {
+            //修改时获取选中的所有行
+            var rows = $(datagridId).datagrid('getSelections');
+            //如果只选择了一行则可以进行修改，否则不操作
+            if (rows.length == 1) {
+                var rowData = $(datagridId).datagrid('getSelected');
+                //获取到当前选择行的下标（此时rows只有一行，所以是0）
+                var index = $(datagridId).datagrid('getRowIndex', rows[0]);
+                //开启编辑
+                $(datagridId).datagrid('beginEdit', index);
+                //把当前开启编辑行赋给变量editRow
+                editRow = index;
+            } else {
+                $.messager.alert("提示", "必须选择一行进行编辑", "error");
+            }
+        }
+        //修改Ajax，数据由ajax提交到后台
+        $.updateAjax = function (url, data, datagrid) {
+            return jQuery.ajax({
+                //请求的方式，也就是method
+                'type': 'PUT',
+                'url': url,
+                //用来告诉服务端消息主体是序列化后的 JSON 字符串，发送到服务器的数据的编码类型
+                'contentType': 'application/json',
+                //stringtify:对象到字符串；parse:字符串到json对象
+                //发送到服务器的数据
+                'data': JSON.stringify(data),
+                //预期返回类型，datatype用来判断是success还是error，若实际返回格式与预期格式相同，则执行success
+                'dataType': 'json',
+                success: function (msg) {
+                    if (msg.data == undefined) {
+                        $.messager.alert('消息提示', '更新成功', 'info');
+                        $(datagrid).datagrid('reload');//更新成功之后调用
+                    } else {
+                        $.messager.alert("操作提示", "操作失败！" + msg.data + "," + msg.message, "error");
+                        $(datagrid).datagrid('reload');
+                    }
+                },
+                error: function (msg) {
+                    $.messager.alert('消息提示', '更新失败', 'error');
+                }
+            });
+        };
+        //保存操作
+        function saveOpe(datagridId) {
+            //保存时结束当前编辑的行，调用endEdit方法时，自动触发onAfterEdit事件，如果要与后台交互可将数据通过Ajax提交后台
+            $(datagridId).datagrid('endEdit', editRow);
+            if (editRow != undefined) {
+                //如果验证不通过就不会触发onAfterEdit，直接进入执行if语句
+                $.messager.alert('消息提示', '请检查输入信息，查看红色字段', 'warn');
+            }
+        }
+        //删除操作
+        function deleteOpe(datagridId, url) {
+            //删除时，先获取选中的行
+            var row = $(datagridId).datagrid('getSelected');
+            if (row) {
+                $.messager.confirm("提示", "你确定要删除吗？",
+                    function (r) {
+                        if (r) {
+                            //一定要有这个(这是判断true还是false的)
+                            //url = basePath()+'/deleteEducationQualification?id=';
+                            $.deleteAjax(url + row.id, datagridId);
+                        }
+                    });
+            } else {
+                $.messager.alert("提示", "请选择要删除的行", "error");
+            }
+        }
+        //删除Ajax
+        $.deleteAjax = function (url, datagrid) {
+            return jQuery.ajax({
+                'type': 'DELETE',
+                'url': url,
+                success: function (msg) {
+                    if(msg.data == undefined){
+                        $.messager.alert('消息提示', '删除成功', 'info');
+                        $(datagrid).datagrid('reload');
+                    }else{
+                        $.messager.alert('消息提示', '删除失败'+msg.responseText, 'error');
+                    }
+
+                },
+                error: function (msg) {
+                    $.messager.alert('消息提示', '删除失败', 'error');
+                }
+            });
+        };
+        //取消操作
+        function cancelOpe(datagridId) {
+            //取消添加新行，并将新插入的该行删去
+            if (beingInsertedRow == 0) {
+                $(datagridId).datagrid('deleteRow', beingInsertedRow);
+                beingInsertedRow = undefined;//插入行重新变为未定义
+                editRow = undefined;
+            }
+            //取消当前编辑行把当前编辑行undefined回滚改变的数据,取消选择的行
+            if (editRow != undefined) {
+                $(datagridId).datagrid('cancelEdit', editRow);
+            }
+        }
+        //endEdit触发的操作
+        function endEditOpe(rowData, addUrl, updateUrl, datagridId) {
+            console.info(rowData);//控制台输出数据
+            //添加后触发的endEdit事件
+            if (beingInsertedRow != undefined) {
+                $.saveAjax(addUrl, rowData, datagridId);
+                beingInsertedRow = undefined;//保存后，插入行重新变为未定义
+                editRow = undefined;//保存后，编辑行重新变为未定义
+            }
+            //当编辑后触发的endEdit事件
+            if (editRow != undefined) {
+                $.updateAjax(updateUrl, rowData, datagridId);
+                editRow = undefined;//保存后，编辑行重新变为未定义
+            }
+        }
+        //双击触发的操作
+        function dblClickOpe(rowData, rowIndex, datagridId) {
+            //开启编辑
+            $(datagridId).datagrid('beginEdit', rowIndex);
+            //把当前开启编辑行赋给变量editRow
+            editRow = rowIndex;
+        }
+        $.extend($.fn.validatebox.defaults.rules, {
+            name: {
+                // 验证姓名，可以是中文或英文
+                validator: function (value) {
+                    return /^[A-Za-z]+$/i.test(value) | /^[\u0391-\uFFE5]+$/.test(value);
+                },
+                message: '请输入汉字或字母'
+            },
+            Number: {// 验证整数
+                validator: function (value) {
+                    var reg = /^[0-9]*$/;
+                    return reg.test(value);
+                },
+                message: '请输入数字'
+            }
+        });
+        //时间限制
+        //        $(function(){
+        //            $('#enterSchoolTime').datebox({
+        //                onSelect:function(date){
+        //                    alert(date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate());
+        //                }
+        //            });
+        //            $('#getTime').datebox().datebox('calendar').calendar({
+        //                validator:function(date){
+        //                    var dl=new Date($('#enterSchoolTime').datebox('getValue'));
+        //                    if(date>=dl){
+        //                        return true;
+        //                    }else{
+        //                        return false;
+        //                    }
+        //                }
+        //            });
+        //        });
+    </script>
+</table>
+<div id="educationToolbar" style="padding:5px;height:auto">
+    <div style="margin-bottom:5px">
+        <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" id="EducationQualification_add_btn"
+           onclick="addOpe('#educationQualificationTable')">添加</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" id="EducationQualification_edit_btn"
+           onclick="updateOpe('#educationQualificationTable')">编辑</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" id="EducationQualification_save_btn"
+           onclick="saveOpe('#educationQualificationTable')">保存</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" id="EducationQualification_remove_btn"
+           onclick="deleteOpe('#educationQualificationTable',basePath()+'/deleteEducationQualification?id=')">删除</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-redo" plain="true" id="EducationQualification_redo_btn"
+           onclick="cancelOpe('#educationQualificationTable')">取消</a>
+    </div>
+</div>
+</body>
+</html>

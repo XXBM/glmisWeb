@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>辅修系统>管理员>报名明细</title>
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css"/>
+    <style type="text/css">
+        /*数据表格单元格的高度*/
+        .datagrid-btable tr{height: 50px;}
+        /*数据表格标题的字体大小*/
+        .datagrid-header span {font-size: 15px !important;}
+
+
+    </style>
+</head>
+<body>
+<span  style="padding:0px;font-family:宋体 ;font-size:15px" >辅修系统>管理员>报名明细</span>
+<span  style="padding:0 0 0 60%;font-family:宋体 ;font-size:15px" >当前用户：于老师 0200XX</span></br></br>
+<div>
+    <select class="easyui-combobox" style="width:300px;height:30px" editable="false">
+        <option value="ar">2015级</option>
+        <option value="ar">2014级</option>
+    </select>
+    <a href="#" class="easyui-linkbutton"  onclick="">导出excel表格</a>
+</div></br></br>
+<table border="1px" id = "tt" >
+    <thead>
+    <th data-options="field:'t1'"style="width:5%;">序号</th>
+    <th data-options="field:'t2'"style="width:5%;"> 姓名</th>
+    <th data-options="field:'t3'" style="width:13%;">学号</th>
+    <th data-options="field:'t4'" style="width:10%;">班级</th>
+    <th data-options="field:'t5'" style="width:10%;">学生所在学院</th>
+    <th data-options="field:'t6'" style="width:10%;">主修专业学科门类</th>
+    <th data-options="field:'t7'" style="width:10%;">主修专业所属专业类</th>
+    <th data-options="field:'t8'" style="width:10%;">辅修专业名称</th>
+    <th data-options="field:'t9'" style="width:10%;">学生电话</th>
+    <th data-options="field:'t0'" style="width:15%;">备注</th>
+    </thead>
+</table>
+</body>
+<script>
+    $('#tt').datagrid({
+        singleSelect: true,
+        rowNumbers: "true",//显示行号
+        //pagination: "true",//分页
+        //remoteSort: false,//对本地数据进行排序
+        fitColumns:true,//自适应表格大小
+        //collapsible: true, //隐藏按钮
+        frozenColumns: [[{ field: "chk", "checkbox": true}]],//单选框
+        url:'TRegistration',
+    });
+
+
+    $.postJSON1 = function(url, data) {
+        return jQuery.ajax({
+            'type' : 'POST',
+            'url' : url,
+            'contentType' : 'application/json',
+            'data' : JSON.stringify(data),
+            'dataType' : 'json',
+            success: function (msg) {
+                alert("更新成功")
+                $('#dlg').dialog('close');
+                $('#tt').datagrid('reload');
+            },
+            error:function (msg) {
+                alert("更新失败" + msg);
+            }
+        });
+    };
+    $.postJSON2 = function (url, data) {//这个是最为重要的方法之一了
+        return jQuery.ajax({//用Ajax的方法来传递
+            'type': 'POST',//种类是POST
+            'url': url,
+            'contentType': 'application/json',
+            'data': JSON.stringify(data),
+            'dataType': 'json',//数据的种类是JSON
+            success: function (msg) {
+                alert("添加成功");
+                $('#dlg').dialog('close');
+                $('#tt').datagrid('reload');//添加成功之后调用
+            },
+            error: function (msg) {
+                alert("添加失败");
+            }//添加失败之后调用
+
+        });
+    }
+
+
+
+</script>
+</html>

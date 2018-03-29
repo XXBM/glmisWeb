@@ -1,0 +1,167 @@
+$(function(){
+    //全局变量
+    obj = {
+            editRow:undefined,
+        //editRow:false,
+        editRow:undefined,
+        reject:function(){
+            alert('请输入申请理由！');
+        },
+        //保存
+        save:function(){
+            //下面这两句应该是保存成功之后再执行
+            //this.editRow = false;
+            //隐藏
+            //$('#save,#redo').hide();
+            //将第一行设置为结束编辑状态
+            //保存的话得先结束编辑，然后内部再去换算是不是要去调用onAfterEdit方法
+            //当前行结束编辑
+            //你保存的时候要保存哪一行用this.editRow
+            $('#table').datagrid('endEdit',this.editRow);
+            $('#save').hide();
+            this.editRow = undefined;//后面要保存这一行，所以要得到这一行的索引
+        },
+        //新建申请
+        dialog:function(){
+            $('#dialog').dialog({
+               closed:false,
+            });
+        },
+        //提交申请
+        tijiao:function(){
+            $('#dialog').dialog({
+                closed:true,
+            });
+            //关于批量问题，添加if判断
+            if(this.editRow==undefined){
+                //添加一行
+                $('#table').datagrid('insertRow',{
+                    index:0,
+                    row:{
+                        time:"2014.10.8",
+                        content:"学生证",
+                        type:"",
+                        status:"",
+                        other:""
+                    }
+                });
+                //将第一行设置为可编辑状态
+                //$('#table').datagrid('beginEdit',0);
+                this.editRow = undefined;//后面要保存这一行，所以要得到这一行的索引
+            }
+        },
+        //提交申请
+        tijiao2:function(){
+            $('#dialog2').dialog({
+                closed:true,
+            });
+        },
+        //取消申请
+        quxiao:function(){
+            $('#dialog').dialog({
+                closed:true,
+            });
+        },
+
+
+        //取消编辑
+        redo:function(){
+            this.editRow = undefined;
+            //隐藏
+            $('#save,#redo').hide();
+            //回滚到编辑之前
+            $('#table').datagrid('rejectChanges');
+        },
+        //修改
+        //多选时，怎么修改，增加难度，进行容错
+        edit:function(){
+            $('#dialog2').dialog({
+                closed:false,
+            });
+        },
+
+
+    };
+    $('#table').datagrid({
+        width:500,
+        //iconCls:'icon-edit',//图标
+        striped:true,//是否显示斑马线效果
+        nowrap:true,//是否显示一行效果
+        fitColumns:true,//自适应
+        url:'seal.json',//引入连接数据库的文件
+        toolbar:'#tb',
+        columns:[[
+            {
+                field:'time',//列字段
+                title:'时间',//列标题
+                //sortable:true,
+                width:100,
+                editor:{
+                    type:'text',
+                    //type:'validatebox',
+                    options:{
+                        required:true,
+                    }
+                }
+
+            },
+            {
+                field:'content',//列字段
+                title:'内容',//列标题
+                //sortable:true,
+                width:100,
+                editor:{
+                    type:'text',
+                    //type:'validatebox',
+                    options:{
+                        required:true,
+                    }
+                }
+            },
+            {
+                width:100,
+                field:'type',//列字段
+                title:'类别',//列标题
+                //sortable:true,
+                editor:{
+                    type:'text',
+                    //type:'validatebox',
+                    options:{
+                        required:true,
+
+                    }
+                }
+            },
+            {
+                width:100,
+                field:'status',//列字段
+                title:'状态',//列标题
+                //sortable:true,
+                //对于时间可以不实现，当保存时后台可以自动设置
+                editor:{
+                    type:'text',
+                    //type:'validatebox',
+                    options:{
+                        required:true,
+                    }
+                }
+
+            },
+            {
+                width:100,
+                field:'other',//列字段
+                title:'备注',//列标题
+                //sortable:true,
+                //对于时间可以不实现，当保存时后台可以自动设置
+                editor:{
+                    type:'text',
+                    //type:'validatebox',
+                    options:{
+                        required:true,
+                    }
+                }
+
+            }
+        ]],
+    });
+});

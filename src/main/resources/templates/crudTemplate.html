@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>增删改查模板</title>
+    <!--加载资源文件-->
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js" th:src="@{easyui/jquery.min.js}"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js" th:src="@{easyui/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js" th:src="@{easyui/locale/easyui-lang-zh_CN.js}"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css" th:href="@{easyui/themes/default/easyui.css}"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css" th:href="@{easyui/themes/icon.css}"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/color.css"  th:href="@{easyui/themes/color.css}"/>
+    <style type="text/css">
+        #fm
+        {
+            margin: 0;
+            padding: 10px 30px;
+        }
+        .fitem
+        {
+            margin-bottom: 5px;
+        }
+        .fitem label
+        {
+            display: inline-block;
+            width: 80px;
+        }
+    </style>
+    <script type="text/javascript">
+        <!--显示表格中的数据-->
+        $(function () {
+            $('#tt').datagrid({
+                title:'增删改查模板表',
+                iconCls: 'icon-ok',
+                toolbar:'#toolbar',
+//                只要这里一改成get方式
+               method:'get',
+                url:'/displayAll',
+                width: 500,
+                height: 300,
+                singleSelect: true,
+                rowNumbers: "true",//显示行号
+                remoteSort: false,//对本地数据进行排序
+                fitColumns:true,//自适应表格大小
+                frozenColumns: [[{ field: "chk", "checkbox": true}]],//单选框
+                columns: [[
+                    {field: 'id', title: '编号', width: 70, align: 'center'},
+                    {field: 'departmentName', title: '学院', width: 80, align: 'center'},
+                    {field: 'university',
+                        formatter:function (value,rec) {
+                            return rec.university.schoolName;
+                    }, title: '所在学校', width: 80, align: 'center'}
+                ]],
+                pagination: "true",//分页
+            });
+            //分页用的获取datagrid中的详细内容，后台只需要获取easyui自动提供pages和rows（我好像需要一个rows）即可。
+            var p = $('#tt').datagrid('getPager');
+            $(p).pagination({
+                showPageList:false,
+                beforePageText: '第',//页数文本框前显示的汉字
+                afterPageText: '页    共 {pages} 页',
+                displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+                onBeforefresh:function () {
+                    $(this).pagination('loading');
+                    alert('before refresh');
+                    $(this).pagination('loaded');
+
+                }
+            });
+        });
+        var isOperated = 0;
+        //增加
+        function addRecord() {
+            isOperated = 1;
+            $('#dlg').dialog('open').dialog('setTitle', '增加');//给表格命名为增加
+            $('#fm').form('clear');
+            url = "/addDepartment";
+        };
+
+        //修改
+        function editRecord() {
+            isOperated = 0;
+            var row = $('#tt').datagrid("getSelected");
+            if(row==null){
+                $.messager.alert("提示","请选择要修改的行！","info");
+            }
+            if (row) {
+                $("#dlg").dialog("open").dialog('setTitle', '修改信息');
+                //绑定数据源
+                $("#fm").form("load", row);
+                $('#id').val(row.id);
+                $('#departmentName').val(row.departmentName);
+                url = "/updateDepartment";
+            }
+        };
+
+        //序列化表单元素
+        function serializeObject(form){
+            var o = {};
+            var a = $(form).serializeArray();
+            $.each(a, function() {
+                if (o[this.name]) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || "");
+                } else {
+                    o[this.name] = this.value || "";
+                }
+            });
+            return o;
+        };
+
+        $.postJSON1 = function(url, data) {
+            return jQuery.ajax({
+                'type' : 'POST',
+                'url' : url,
+                'contentType' : 'application/json',
+                'data' : JSON.stringify(data),
+                'dataType' : 'json',
+                success: function (msg) {
+                    alert("更新成功");
+                    $('#dlg').dialog('close');
+                    $('#tt').datagrid('reload');
+
+                },
+                error:function (msg) {
+                    alert("更新失败" + msg);
+                }
+            });
+        };
+
+        $.postJSON2 = function (url, data) {//这个是最为重要的方法之一了
+            return jQuery.ajax({//用Ajax的方法来传递
+                'type': 'POST',//种类是POST
+                'url': url,
+                'contentType': 'application/json',
+                'data': JSON.stringify(data),
+                'dataType': 'json',//数据的种类是JSON
+                success: function (msg){
+                    alert("添加成功");
+                    $('#dlg').dialog('close');
+                    $('#tt').datagrid('reload');//添加成功之后调用
+                },
+                error: function (msg) {
+                    alert("添加失败");
+                }//添加失败之后调用
+            });
+        };
+
+        //保存
+        function saveRecord() {
+            var data= serializeObject("#fm");
+            if(isOperated == 1){
+                $.postJSON2('/addDepartment', data);//应用方法传送，写上了URL和传的data
+            }else if(isOperated == 0){
+                $.postJSON1('/updateDepartment', data);
+            }
+        };
+
+        //删除
+        function removeRecord(){
+            //得到当前选中行的记录，
+            var row = $('#tt').datagrid('getSelected');
+            //必须当选中一行时，才可以删除
+            if (row!=null) {
+                $.messager.confirm('提示', '你确定要删除这条信息吗？', function (r) {
+                    if (r) {
+                        $('#fm').form('submit',{
+                            url: '/deleteDepartment?id=' + row.id ,
+                            onSubmit: function () {
+                            },
+                            //判断结果是否正确
+                            success: function () {
+                                $('#tt').datagrid('reload');
+                                alert('恭喜您，信息删除成功！')
+                            }
+                        });
+                    }
+                });
+            }else{
+                $.messager.alert("提示","请选择要删除的信息！","info");
+                return false;
+            }
+        };
+
+    </script>
+</head>
+<body >
+
+
+<table id="tt" class="easyui-datagrid">
+    <!--添加icon-->
+    <div id="toolbar" style="padding:5px;height:auto">
+        <div style="margin-bottom:5px">
+            <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRecord()">添加</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editRecord()">编辑</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-cut" plain="true" onclick="removeRecord()" >删除</a>
+            <label>学校：</label>
+            <input  class="easyui-combobox" name="schoolName"
+                    value="请选择学校"  th:value="请选择学校"
+                    data-options="
+            required:true,
+            method:'get',
+            mode:'remote',
+            url:'/findAllSchoolName',
+            valueField:'id',
+            textField:'schoolName',
+            onSelect:function(rec){
+            var url = '/display?id='+rec.id;
+            $('#tt').datagrid('reload',url);
+            }
+            "
+            />
+        </div>
+    </div>
+</table>
+<div id="dlg" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px;"
+     closed="true" buttons="#dlg-buttons">
+    <form id="fm" method="post" >
+        <div class="fitem">
+            <input name="id" class="easyui-validatebox" required="true" hidden="true"/>
+        </div>
+        <div class="fitem">
+            <label>
+                学院
+            </label>
+            <input name="departmentName" class="easyui-validatebox" required="true"/>
+        </div>
+    </form>
+</div>
+<div></div>
+<div id="dlg-buttons">
+    <a href="#" class="easyui-linkbutton" onclick="saveRecord()" iconcls="icon-save">保存</a>
+    <a href="#" class="easyui-linkbutton" onclick="javascript:$('#dlg').dialog('close')"
+       iconcls="icon-cancel">取消</a>
+</div>
+</body>
+</html>

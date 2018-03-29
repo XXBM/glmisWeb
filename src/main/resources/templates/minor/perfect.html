@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生完善个人信息</title>
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css"/>
+</head>
+<body >
+<div>
+    <span  style="padding:0px;font-family:宋体 ;font-size:15px" >辅修系统>学生>完善个人信息</span>
+    <form id="fm" style="width:100%;padding:30px 32%;font-family:宋体 ;font-size:15px">
+            <!--控制单元格间距-->
+            <table cellSpacing="10px" >
+                <tr>
+                    <td style="width:80px">姓名:</td>
+                    <!--文本框-->
+                    <td><input id="tBox1" required="true" class="easyui-textbox" name="px" type="text" style="width:300px;height:30px"></td>
+                </tr>
+            <tr>
+                <td>Email:</td><!--validType="email"，输入有效信息；prompt:，提示信息-->
+                <td><input id="tBox2" required="true" class="easyui-textbox" name="px" type="email" validType="email" style="width:300px;height:30px"></td>
+            </tr>
+            <tr>
+                <td>性别:</td><!--单选框-->
+                <td ><input id="tBox3"type="radio" required="true" name="px" value="0" >否</input><input type="radio" name="adminFlag" value="1">是</input></td>
+
+            </tr>
+            <tr>
+                <td>电话:</td>
+                <td><input id="tBox4" name="px" required="true" class="easyui-textbox" type="text" style="width:300px;height:30px"></td>
+            </tr>
+            <tr>
+                <td>主修学院:</td>
+                <!--下拉框,required="true"必填项,data-options="url:'json'",editable:false固定下拉框内容
+                //data形成数据
+                data-options=" editable:false,valueField:'value',textField:'text',data:[{'value':'1','text':'java'},{'value':'2','text':'C#'}]"
+                -->
+                <td><select class="easyui-combobox" name="px" id="box1" style="width:300px;height:30px" required="true"editable="false">
+                   <option value="ar">土木工程学院</option>
+                    <option value="bg" selected="selected">管理工程学院</option>
+                    <option value="ca">热能工程学院</option>
+                    <option value="zh-cht">市政与环境工程学院</option>
+                    <option value="cs">建筑城规学院</option>
+                    <option value="da">艺术学院</option>
+                    <option value="nl">机电工程学院</option>
+                    <option value="en" >信息与电气工程学院</option>
+                    <option value="et">商学院</option>
+                    <option value="fi">材料科学与工程学院</option>
+                    <option value="fr">……</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>主修专业:</td>
+                <td><select class="easyui-combobox" name="px" style="width:300px;height:30px" id="box2" required="true" editable="false">
+                    <option value="ar">土木工程</option>
+                    <option value="bg" selected="selected">信息管理与信息系统</option>
+                    <option value="ca">物联网</option>
+                    <option value="zh-cht">测绘</option>
+                    <option value="cs">造价</option>
+                    <option value="da">园林</option>
+                    <option value="nl">软件工程</option>
+                    <option value="fr">……</option></select></td>
+            </tr>
+            <tr>
+                <td>主修班级:</td>
+                <td><select class="easyui-combobox" name="px" style="width:300px;height:30px" id="box3" required="true" editable="false">
+                    <option value="ar">信管151</option>
+                    <option value="bg" selected="selected">信管152</option>
+                    <option value="fr">……</option></select></td>
+            </tr>
+            <tr>
+                <td>出生日期</td>
+                <td><!--日期框-->
+                <input class="easyui-datebox" name="px" style="width:300px;height:30px" required="true" editable="false">
+            </td></tr>
+        </table>
+    </form>
+    <div style="padding:10px 40%;font-family:宋体 ;font-size:15px;"><!--确认框-->
+    <a href="#" class="easyui-linkbutton" onclick="submit()" style="margin-right:50px;margin-left:70px;height :30px;width:40px">提交</a>
+    <a href="#"  class="easyui-linkbutton" onclick="javascript:$('#window').window('close')" style="height :30px;width:40px">取消</a></div>
+</div>
+</div>
+<script>
+/*下拉框读取后台json数据
+    var url = "${pageContext.request.contextPath}/user_findUlist.action";
+    $.getJSON(url, function(json) {
+        $('#box1').combobox({
+            data : json.rows,
+            valueField:'userId',
+            textField:'name'
+        });
+    });
+    */
+
+    function serializeObject(form) {
+        var o = {};
+        var a = $(form).serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || "");
+            } else {
+                o[this.name] = this.value || "";
+            }
+        });
+        return o;
+    };
+
+    function submit() {
+        var txt = serializeObject("#fm");
+        //var txt =  $('.qx').getFormJson("form");
+        $.postJSON1('<%=basePath%>openAdd.html', txt)//应用方法传送，写上了URL和传的txt
+        //console.log(txt);
+        $.post(url, txt,function(data){
+            if(data.msg==1)
+                alert("提交成功")
+            else
+                alert("提交失败")
+        })
+    }
+
+    $.postJSON1 = function (url, data) {
+        return jQuery.ajax({//用Ajax的方法来传递
+            'type': 'POST',//种类是POST
+            'url': url,
+            'contentType': 'application/json',
+            'data': JSON.stringify(data),
+            'dataType': 'json',//数据的种类是JSON
+            success: function (msg) {
+                alert("提交成功");
+            },
+            error: function (msg) {
+                alert("添加失败");
+            }//添加失败之后调用
+
+        });
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>辅修系统>管理员>基础信息维护>专业</title>
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css"/>
+    <style type="text/css">
+        /*数据表格单元格的高度*/
+        .datagrid-btable tr{height: 50px;}
+        /*数据表格标题的字体大小*/
+        .datagrid-header span {font-size: 15px !important;}
+
+
+    </style>
+</head>
+<body>
+<span  style="padding:0px;font-family:宋体 ;font-size:15px" >辅修系统>管理员>基础信息维护>专业</span>
+<span  style="padding:0 0 0 60%;font-family:宋体 ;font-size:15px" >当前用户：于老师 0200XX</span></br></br>
+<div>
+    学院：
+    <select class="easyui-combobox" style="width:300px;height:30px" editable="false">
+        <option value="ar">土木工程学院</option>
+        <option value="ar">管理工程学院</option>
+    </select>
+</div></br></br>
+<table border="1px" id = "tt" >
+    <div id="toolbar" style="padding:5px;height:auto">
+        <div style="margin-bottom:5px">
+            <a href="#" class="easyui-linkbutton" iconCls="icon-add"  onclick="addUser()">修改</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-edit"  onclick="removeUser()">删除</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-edit"  onclick="addUser()">增加专业</a>
+        </div>
+        <thead>
+        <th data-options="field:'t1'"style="width:30%;">专业名称</th>
+        <th data-options="field:'t2'"style="width:30%;"> 专业学科门类</th>
+        <th data-options="field:'t3'" style="width:40%;">专业所属专业类</th>
+        </thead>
+    </div>
+    </table>
+<div id="dlg" class="easyui-window" title="辅修系统>管理员>基础信息维护>专业>增加/修改"style="width:420px;height:280px;padding:10px 20px;font-family:宋体 ;font-size:15px"
+     closed="true" align="center">
+    <form id="fm">
+        <div class="fitem" style="margin-bottom:10px">
+            学院:
+            <select class="easyui-combobox" style="width:300px;height:30px" editable="false">
+                <option value="ar">土木工程学院</option>
+                <option value="ar">管理工程学院</option>
+            </select>
+        </div>
+        <div class="fitem" style="margin-bottom:10px">
+           专业:
+            <input id="tBox1" required="true" class="easyui-textbox" name="px" type="text" style="width:300px;height:30px" >
+        </div>
+        <div class="fitem" style="margin-bottom:10px">
+            学科门类:
+            <select class="easyui-combobox" style="width:270px;height:30px"editable="false">
+                <option value="ar">工程造价</option>
+                <option value="ar">土木工程</option>
+            </select>
+        </div>
+        <div class="fitem" style="margin-bottom:10px">
+            所属专业类:
+            <select class="easyui-combobox" style="width:255px;height:30px"editable="false">
+                <option value="ar">土木工程</option>
+                <option value="ar">管理学</option>
+            </select>
+        </div>
+
+    </form></br>
+    <div id="dlg-buttons">
+        <a href="#" class="easyui-linkbutton" onclick="saveUser()" style="margin:0px 70px;">保存</a>
+        <a href="#" class="easyui-linkbutton" onclick="javascript:$('#dlg').dialog('close')" >取消</a>
+    </div>
+</div>
+
+</body>
+<script>
+    $('#tt').datagrid({
+        singleSelect: true,
+        rowNumbers: "true",//显示行号
+        //pagination: "true",//分页
+        //remoteSort: false,//对本地数据进行排序
+        fitColumns:true,//自适应表格大小
+        //collapsible: true, //隐藏按钮
+        frozenColumns: [[{ field: "chk", "checkbox": true}]],//单选框
+        url:'TProfessional',
+    });
+    function addUser() {
+        var row = $('#tt').datagrid("getSelected");
+        if(row){
+            $.messager.alert("提示","增加一行！","info");
+        }
+        if(row=!null) {
+            $('#dlg').window('open');
+            url = "<%=basePath%>update.html&id"+row.id;
+        }
+
+
+    }
+    //删除
+    function removeUser() {
+        var row = $('#tt').datagrid('getSelected');
+        if (row==null) {
+            alert("请至少选择一行数据!");}
+        if(row) {
+            $.messager.confirm('提示', '你确定要删除这条信息吗？', function () {
+                $('#fm').form('submit', {
+                    url: '<%=basePath%>removeUser.html?id=' + row.id,
+                    onSubmit: function () {
+                    },
+                    //判断结果是否正确
+                    success: function (msg) {
+                        $('#tt').datagrid('reload');
+                        //alert('恭喜您，信息删除成功！')
+                    },
+                    error:function (msg) {
+                        alert("更新失败" + msg);
+                    }
+                });
+            });
+        }
+    }
+    function serializeObject(form)
+    {
+        var o = {};
+        var a = $(form).serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || "");
+            } else {
+                o[this.name] = this.value || "";
+            }
+        });
+        return o;
+    };
+    function saveUser() {
+        var data= serializeObject("#fm");
+        if(addUser()){
+            $.postJSON2('<%=basePath%>openAdd.html', data)//应用方法传送，写上了URL和传的data
+        }
+        else
+        {
+            $.postJSON1('<%=basePath%>update.html', data)
+        }
+
+    }
+    $.postJSON1 = function(url, data) {
+        return jQuery.ajax({
+            'type' : 'POST',
+            'url' : url,
+            'contentType' : 'application/json',
+            'data' : JSON.stringify(data),
+            'dataType' : 'json',
+            success: function (msg) {
+                alert("更新成功")
+                $('#dlg').dialog('close');
+                $('#tt').datagrid('reload');
+            },
+            error:function (msg) {
+                alert("更新失败" + msg);
+            }
+        });
+    };
+    $.postJSON2 = function (url, data) {//这个是最为重要的方法之一了
+        return jQuery.ajax({//用Ajax的方法来传递
+            'type': 'POST',//种类是POST
+            'url': url,
+            'contentType': 'application/json',
+            'data': JSON.stringify(data),
+            'dataType': 'json',//数据的种类是JSON
+            success: function (msg) {
+                alert("添加成功");
+                $('#dlg').dialog('close');
+                $('#tt').datagrid('reload');//添加成功之后调用
+            },
+            error: function (msg) {
+                alert("添加失败");
+            }//添加失败之后调用
+
+        });
+    }
+
+
+
+</script>
+</html>

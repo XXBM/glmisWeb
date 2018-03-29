@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<script type="text/javascript" src="../static/isFile/index.js"></script>
+
+<body class="easyui-layout">
+<!--删除和修改之后，页面全部选择。-->
+<!--点击管理员才出现，数据-->
+<style type="text/css">
+    .fitem {
+        margin-bottom: 5px;
+    }
+
+    .fitem label {
+        display: inline-block;
+        width: 80px;
+    }
+
+    .information {
+        float: left;
+        height: 29px;
+    }
+
+    #newstaff {
+        height: 40px;
+    }
+
+    #selectdepartment {
+        height: 30px;
+    }
+
+    #staffs {
+        float: left;
+        width: 200px;
+    }
+
+    #information {
+        float: left;
+        padding-left: 90px;
+    }
+
+    .pic {
+        float: right;
+        width: 220px;
+        margin-right: 10px;
+        margin-top: 5px;
+    }
+
+    .info {
+        float: left;
+        margin-left: 10px;
+        margin-top: 5px;
+        width: 500px;
+    }
+
+    .file {
+        position: relative;
+        display: inline-block;
+        background: #D0EEFF;
+        border: 1px solid #99D3F5;
+        border-radius: 4px;
+        padding: 1px 12px;
+        overflow: hidden;
+        color: #1E88C7;
+        text-decoration: none;
+        text-indent: 0;
+        line-height: 20px;
+    }
+
+    .file input {
+        position: absolute;
+        font-size: 100px;
+        right: 0;
+        top: 0;
+        opacity: 0;
+    }
+
+    .file:hover {
+        background: #AADFFD;
+        border-color: #78C3F3;
+        color: #004974;
+        text-decoration: none;
+    }
+
+    /*淡薄荷色*/
+    .validatebox-invalid,
+    .textbox-invalid {
+        background-color: mintcream;
+    }
+</style>
+
+<!--???-->
+<div data-options="region:'center',title:'个人信息',split:true">
+    <div id="newstaff">
+        添加新员工
+        <a id="Employee_add_linkbutton" href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onClick="newStaffadd()">添加</a>
+        <a id="Employee_delete_linkbutton" href="#" class="easyui-linkbutton" iconCls="icon-cut" plain="true" onClick="staffremoveRecord()">删除</a>
+    </div>
+    <!--选择部门  mode:'remote':从服务器获取时就设为remote -->
+    <div id="selectdepartment">
+        选择部门
+        <input id="Department_select_combobox" class="easyui-combobox" name="selectDepartment"
+               value="请选择部门" th:value="请选择部门"
+               data-options="
+                    required:true,
+                    method:'get',
+                    mode:'remote',
+                    url:basePath()+'/findAllDepartment',
+                    valueField:'id',
+                    textField:'departmentName',
+                    onSelect:function(rec){
+                        var url = basePath()+'/displayEmpByDep?id='+rec.id;
+                        $('#staff').datagrid('reload',url);
+                        var Text =$('#Department_select_combobox').combobox('getText');
+                        if(Text=='全部'){
+                            var url = basePath()+'/displayAllEmployeeName';
+                            $('#staff').datagrid('reload',url);
+                        }
+                    }
+                "
+        />
+    </div>
+    <!--这个table不起作用，只是为了让其他datagrid正常显示-->
+    <div class="easyui-dialog" closed="true">
+        <table id="noUse" class="easyui-datagrid">
+            <script>
+                $(function () {
+                    $('#noUse').datagrid({});
+                });
+            </script>
+        </table>
+        <table id="partyInfo" class="easyui-datagrid" th:hidden="true"/>
+    </div>
+    <!--员工列表-->
+    <div id="staffs">
+        <table id="staff" class="easyui-datagrid">
+        </table>
+    </div>
+    <!--个人信息-->
+    <div id="information">
+        <div id="empInfoTabs" class="easyui-tabs" style="width:780px;height:420px;">
+            <div id="personalMessage" title="个人信息" th:scrolling="yes">
+                <!--个人信息表格内容-->
+                <div class="self">
+                    <div class="info">
+                        <!--个人信息表格-->
+                        <form id="Actor">
+                            <!--id-->
+                            <div class="fitem">
+                                <input id="Employee_id_validatebox" name="id" class="easyui-validatebox" hidden="true"/>
+                            </div>
+                            <!--姓名-->
+                            <div id="Employee_name_div" class="information">
+                                <label>
+                                    姓名
+                                </label>
+                                <!--required="true" 定义该字段是否应被输入-->
+                                <input id="Employee_name_validatebox" name="name" class="easyui-validatebox" size="7"
+                                       data-options="
+                                           required:'true',
+                                           missingMessage:'该字段不能为空',
+                                       "
+                                />
+                            </div>
+                            <!--性别-->
+                            <div id="Employee_sex_div" class="information">
+                                <label>
+                                    性别
+                                </label>
+                                <input id="Employee_sex_combobox" name="sex" class="easyui-combobox" required="true" size="4"
+                                       data-options="
+                                                required:true,
+                                                method:'get',
+                                                mode:'remote',
+                                                url:basePath()+'/findAllSex',
+                                                valueField:'id',
+                                                textField:'description',
+                                                editable:false,
+                                                "
+                                />
+                            </div>
+                            <!--部门-->
+                            <div id="Employee_department_div" class="information">
+                                <label>
+                                    部门
+                                </label>
+                                <input id="Employee_department_combobox" name="department" class="easyui-combobox" required="true" size="20"
+                                       data-options="
+                                                required:true,
+                                                method:'get',
+                                                mode:'remote',
+                                                url:basePath()+'/findAllDepartment',
+                                                valueField:'id',
+                                                textField:'departmentName',
+                                                editable:false,
+                                                "
+                                />
+                            </div>
+                            <!--员工号-->
+                            <div id="Employee_no_div" class="information">
+                                <label>
+                                    员工号
+                                </label>
+                                <input id="Employee_no_validatebox" name="no" class="easyui-validatebox" size="15"/>
+                            </div>
+                            <!--出生年月-->
+                            <div id="Employee_birth_div" class="information">
+                                <label>
+                                    出生年月
+                                </label>
+                                <input id="Employee_birth_datebox" name="birth" class="easyui-datebox" size="10"
+                                       data-options="
+                                           required:'true',
+                                           missingMessage:'该字段不能为空'
+
+                                       "
+                                />
+                            </div>
+                            <!--民族-->
+                            <div id="Employee_nation_div" class="information">
+                                <label>
+                                    民族
+                                </label>
+                                <input id="Employee_nation_combobox" name="nation" class="easyui-combobox" required="true " size="6"
+                                       data-options="
+                                            required:true,
+                                            method:'get',
+                                            mode:'remote',
+                                            url:basePath()+'/findAllNation',
+                                            valueField:'id',
+                                            textField:'description'
+                                "/>
+                            </div>
+                            <!--年龄-->
+                            <div id="Employee_age_div" class="information">
+                                <label>
+                                    年龄
+                                </label>
+                                <input id="Employee_age_validatebox" name="age" class="easyui-validatebox" size="2" readonly="readonly"/>
+                            </div>
+                            <!--籍贯-->
+                            <div id="Employee_grandpaBirthPlace_div" class="information">
+                                <label>
+                                    籍贯
+                                </label>
+                                <input id="Employee_grandpaBirthPlace_validatebox" name="grandpaBirthPlace" class="easyui-validatebox" size="30"/>
+                            </div>
+                            <!--身份证号-->
+                            <div id="Employee_idNo_div" class="information">
+                                <label>身份证号</label>
+                                <input id="Employee_idNo_validatebox" name="idNo" class="easyui-validatebox" size="18"
+                                       data-options="
+                                       required:'false',
+                                       validType:'IDcard',
+                                       missingMessage:'该字段不能为空',
+                                       "
+                                />
+                            </div>
+                            <!--联系电话-->
+                            <div id="Employee_mobile_div" class="information">
+                                <label>
+                                    联系电话
+                                </label>
+                                <input id="Employee_mobile_validatebox" name="mobile" class="easyui-validatebox" size="15"
+                                       data-options="
+                                           validType:'Mobile',
+                                           invalidMessage:'请输入正确的联系电话',
+                                       "
+                                />
+                            </div>
+                            <!--职工类别-->
+                            <div id="Employee_employmentCategory_div" class="information">
+                                <label>
+                                    职工类别
+                                </label>
+                                <input id="Employee_employmentCategory_combobox" name="employmentCategory" class="easyui-combobox" required="true"
+                                       size="12"
+                                       data-options="
+                                                required:true,
+                                                method:'get',
+                                                mode:'remote',
+                                                url:basePath()+'/findAllEmploymentCategory',
+                                                valueField:'id',
+                                                textField:'description',
+                                                editable:false,"
+                                />
+                            </div>
+                            <!--来校时间-->
+                            <div id="Employee_dateToSchool_div" class="information">
+                                <label>
+                                    来校时间
+                                </label>
+                                <input id="Employee_dateToSchool_datebox" name="dateToSchool" class="easyui-datebox" size="12"/>
+                            </div>
+                            <!--参加工作时间-->
+                            <div id="Employee_dateToWork_div" class="information">
+                                <label>
+                                    参加工作时间
+                                </label>
+                                <input id="Employee_dateToWork_datebox" name="dateToWork" class="easyui-datebox" size="12"/>
+                            </div>
+                            <!--是否华侨-->
+                            <div id="Employee_overseasChineseOrNot_div" class="information">
+                                <label>
+                                    是否华侨
+                                </label>
+                                <input id="Employee_overseasChineseOrNot_combobox" name="overseasChineseOrNot" class="easyui-combobox" required="true" size="4"
+                                       data-options="
+                                                required:true,
+                                                method:'get',
+                                                mode:'remote',
+                                                url:basePath()+'/findAllYesOrNo',
+                                                valueField:'id',
+                                                textField:'description'
+                                                "
+                                />
+                            </div>
+                            <!--退休时间-->
+                            <div id="Employee_dateToRetire_div" class="information">
+                                <label>
+                                    退休时间
+                                </label>
+                                <input id="Employee_dateToRetire_datebox" name="dateToRetire" class="easyui-datebox" size="12"/>
+                            </div>
+                            <!--工龄-->
+                            <div id="Employee_workAge_div" class="information">
+                                <label>
+                                    工龄
+                                </label>
+                                <input id="Employee_workAge_validatebox" name="workAge" class="easyui-validatebox" size="2"
+                                       readonly="readonly"/>
+                            </div>
+                            <!--紧急联系人电话-->
+                            <div id="Employee_emergencyMobile_div" class="information">
+                                <label>
+                                    紧急联系人电话
+                                </label>
+                                <input id="Employee_emergencyMobile_validatebox" name="emergencyMobile" class="easyui-validatebox" size="20"
+                                       data-options="
+                                           validType:'Mobile',
+                                           invalidMessage:'请输入正确的紧急联系人电话',
+                                       "
+                                />
+                            </div>
+                            <!--家庭住址-->
+                            <div id="Employee_address_div" class="information">
+                                <label>
+                                    家庭住址
+                                </label>
+                                <input id="Employee_address_validatebox" name="address" class="easyui-validatebox" size="20"/>
+                            </div>
+                            <!--邮箱-->
+                            <div id="Employee_email_div" class="information">
+                                <label>
+                                    邮箱
+                                </label>
+                                <input id="Employee_email_validatebox" name="email" class="easyui-validatebox" size="16"
+                                       data-options="
+
+                                               validType:'email',
+
+                                       "
+                                />
+                            </div>
+                            <!--QQ-->
+                            <div id="Employee_qq_div" class="information">
+                                <label>
+                                    QQ
+                                </label>
+                                <input id="Employee_qq_validatebox" name="qq" class="easyui-validatebox" size="12"
+                                       data-options="
+                                               validType:'Number'
+                                       "
+                                />
+                            </div>
+                            <!--工资编号-->
+                            <div id="Employee_salaryNo_div" class="information">
+                                <label>
+                                    工资编号
+                                </label>
+                                <input id="Employee_salaryNo_validatebox" name="salaryNo" class="easyui-validatebox" size="12"
+                                       data-options="
+
+                                           validType:'Number',
+
+                                       "
+                                />
+                            </div>
+                            <!--微信-->
+                            <div id="Employee_weChat_div" class="information">
+                                <label>
+                                    微信
+                                </label>
+                                <input id="Employee_weChat_validatebox" name="weChat" class="easyui-validatebox" size="12"
+
+                                />
+                            </div>
+                            <!--用户-->
+                            <div class="information">
+                                <input id="Employee_user_valkidatebox" name="user" class="easyui-validatebox" hidden="true"/>
+                            </div>
+                            <!--职工-->
+                            <div class="information">
+                                <input id="Employee_photo_validatebox" name="photo" class="easyui-validatebox" hidden="true"/>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="pic">
+                        <div class="file" id="photoDiv">
+                            <form id="empFile" enctype="multipart/form-data">
+                                点击此处选择文件<input type="file" id="Employee_add_photoId" name="imge"/>
+                            </form>
+                        </div>
+                        <div class="information" id="imgDiv">
+                            <img id="Employee_Img" width="200px" height="200px" style="border:3px" alt="无图片"/>
+                        </div>
+                    </div>
+                    <script>
+                        function change_file() {
+                            //编辑状态才会获取到id
+                            var employRow = $('#staff').datagrid("getSelected");
+                            if (employRow) {
+                                fileSubmit('#empFile', basePath() + '/test1111?empId=' + employRow.id);
+                            }
+                            //添加状态id为0
+                            if (employRow == null) {
+                                fileSubmit('#empFile', basePath() + '/test1111?empId=' + 0);
+                            }
+                        }
+                        //触动上传文件，就进行上传
+                        $("#Employee_add_photoId").on("change", function () {
+                            var fileInput = $("#Employee_add_photoId")[0];
+                            if ((Math.ceil(fileInput.files[0].size / 1024)) >= 1024) {
+                                $.messager.alert('消息提示', '文件大小必须限制在1M以内', 'error');
+                            } else {
+                                change_file();
+                            }
+                        });
+                    </script>
+                </div>
+                <div style="clear: both;margin-left: 5px">
+                    <script>
+                        $('#p').panel({
+                            tools : [{
+                                id: 'Employee_politicalParty_showBtn',
+                                iconCls : 'icon-add',  //图标
+                                handler : function () { //点击触发函数
+                                    $('#p').panel('expand',true)
+                                },
+                            },{
+                                id: 'Employee_politicalParty_closeBtn',
+                                iconCls : 'icon-clear',  //图标
+                                handler : function () { //点击触发函数
+                                    $('#p').panel('collapse',true);
+                                },
+                            }],
+                            onBeforeCollapse: function () {
+                                //return false;                 //取消折叠
+                            },
+                            onCollapse: function () {
+                            },
+
+                            onBeforeExpand: function () {
+                                displayParty(rowData);
+                                //return false;                 //取消展开
+                            },
+                            onExpand: function () {
+                            }
+                        });
+                    </script>
+                    <div id="p" class="easyui-panel" title="党派信息" style="width:200px;height:100px;padding:10px;"
+                         data-options="collapsible:false,
+                                           minimizable:false,
+                                           maximizable:false,
+                                           closable:false,
+                                           collapsed:true,">
+                        <form id="party">
+                            <div class="fitem">
+                                <input name="pid" class="easyui-validatebox" hidden="true"/>
+                            </div>
+                            <div class="fitem">
+                                <input name="employee" class="easyui-validatebox" hidden="true"/>
+                            </div>
+                            <!--政治面貌-->
+                            <div id="Employee_politicalParty_div" class="information">
+                                <label>
+                                    政治面貌
+                                </label>
+                                <input id="Employee_politicalParty_combobox" name="politicalParty" class="easyui-combobox" required="true"
+                                       size="15"
+                                       data-options="
+                                                required:true,
+                                                method:'get',
+                                                width:90,
+                                                mode:'remote',
+                                                url:basePath()+'/findAllPoliticalParties',
+                                                valueField:'id',
+                                                textField:'description',
+                                                editable:false,
+
+                                "/>
+                            </div>
+                            <!--入党时间-->
+                            <div id="Employee_pid_div" class="information">
+                                <label>
+                                    入党时间
+                                </label>
+                                <input id="Employee_pid_combobox" width="70" name="membershipFrom" class="easyui-datebox" size="16" data-options="width:90"/>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!--个人信息的按钮-->
+                <div id="Actortoolbar" style="padding:40px;">
+                    <div style="margin-bottom:5px ;  height:30px;width:100px; margin:0 auto;">
+                        <button id="Employee_save_linkbutton" class="easyui-linkbutton" onClick="staffsaveRecord()"
+                                iconcls="icon-save">保存
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div title="学位">
+                <table id="employeeAssAcademicDegree" class="easyui-datagrid"></table>
+            </div>
+            <div title="职称记录">
+                <table id="employeeAssProfessionalTitle" class="easyui-datagrid"></table>
+            </div>
+            <div title="学历">
+                <table id="employeeAssEducationQualification" class="easyui-datagrid"></table>
+
+            </div>
+            <!--<div title="执业资格">-->
+                <!--<table id="qualification" class="easyui-datagrid"></table>-->
+            <!--</div>-->
+            <div title="执业资格">
+                <script>
+                    //增加执业资格
+                    function qualificationaddRecord() {
+                        isOperated = 1;
+                        var employRow = $('#staff').datagrid("getSelected");
+                        if(employRow){
+                            $('#qualificationdlg').dialog('open').dialog('setTitle', '增加');//给表格命名为增加
+                            $('#qualificationfm').form('clear');
+                            $('#PractisingCertification_employee_validatebox').val(employRow.id);//全部清除后，再将该值重新绑定到employee职工id
+                        }
+                        if(employRow==null){
+                            $.messager.alert("提示","请先选择职员再进行操作","info");
+                        }
+                    };
+                    //修改执业资格
+                    function qualificationeditRecord() {
+                        isOperated = 0;
+                        var row = $('#qualification').datagrid("getSelected");
+                        if(row==null){
+                            $.messager.alert("提示","请选择要修改的行！","info");
+                        }
+                        if (row) {
+                            $('#qualificationdlg').dialog("open").dialog('setTitle', '修改信息');
+                            //绑定数据源
+                            $("#qualificationfm").form("load", row);
+                            $('#PractisingCertification_employee_validatebox').val(row.employee.id);//绑定值，用id
+                            $('#PractisingCertification_issuer_validatebox').combobox('setValue',row.issuer.id);//显示下拉框的值，必须要传id给后台
+                            $('#PractisingCertification_name_validatebox').combobox('setValue',row.practisingCertification.id);//显示下拉框的值，必须要传id给后台
+                        }
+                    };
+                    //保存执业资格
+                    function qualificationsaveRecord() {
+                        var data= serializeObject("#qualificationfm");
+                        if(isOperated == 1){
+                            $.postJSON2(basePath()+'/addQualification', data, '#qualificationdlg', '#qualification');
+                        }else if(isOperated == 0){
+                            $.postJSON1(basePath()+'/updateQualification', data, '#qualificationdlg', '#qualification');
+                        }
+                    };
+                    //删除执业资格
+                    function qualificationremoveRecord(){
+                        //得到当前选中行的记录，
+                        var row = $('#qualification').datagrid('getSelected');
+                        //必须当选中一行时，才可以删除
+                        if (row!=null) {
+                            $.messager.confirm('提示', '你确定要删除这条信息吗？', function (r) {
+                                if (r) {
+                                    $.postJSON3(basePath()+'/deleteQualification?id=' + row.id,'#qualificationdlg', '#qualification');
+                                }
+                            });
+                        }else{
+                            $.messager.alert("提示","请选择要删除的信息！","info");
+                            return false;
+                        }
+                    };
+                    //序列化反序列化表格数据
+                    function serializeObject(form){
+                        var o = {};
+                        var a = $(form).serializeArray();
+                        $.each(a, function() {
+                            if (o[this.name]) {
+                                if (!o[this.name].push) {
+                                    o[this.name] = [o[this.name]];
+                                }
+                                o[this.name].push(this.value || "");
+                            } else {
+                                o[this.name] = this.value || "";
+                            }
+                        });
+                        return o;
+                    };
+                    //更新的json处理
+                    $.postJSON1 = function(url, data, dlg, grid) {//Json转化更新
+                        if($(dlg).form('validate')==false){
+                            $.messager.alert('消息提示','更新失败,请检查红色字段','error');
+                            return;
+                        }
+                        else {
+                            return jQuery.ajax({
+                                'type' : 'PUT',
+                                'url' : url,
+                                'contentType' : 'application/json',
+                                'data' : JSON.stringify(data),
+                                'dataType' : 'json',
+                                success: function () {
+                                    $.messager.alert('消息提示','更新成功','info');
+                                    $(dlg).dialog('close');
+                                    $(grid).datagrid('reload');
+                                },
+                                error:function () {
+                                    $.messager.alert('消息提示','更新失败','error');
+                                }
+                            });
+                        }
+                    };
+                    //添加的json处理
+                    $.postJSON2 = function (url, data, dlg, grid) {//Json转化添加
+                        if($(dlg).form('validate')==false){
+                            $.messager.alert('消息提示','添加失败,请检查红色字段','error');
+                            return;
+                        }
+                        else {
+                            return jQuery.ajax({//用Ajax的方法来传递
+                                'type': 'POST',//种类是POST
+                                'url': url,
+                                'contentType': 'application/json',
+                                'data': JSON.stringify(data),
+                                'dataType': 'json',//数据的种类是JSON
+                                success: function (msg){
+                                    if (msg.data == undefined) {
+                                        $.messager.alert('消息提示','添加成功','info');
+                                        $(dlg).dialog('close');
+                                        $(grid).datagrid('reload');//添加成功之后调用
+                                        displayInfor();//添加成功之后调用
+                                    } else {
+                                        $.messager.alert("操作提示", "操作失败！" + msg.data + "," + msg.message, "error");
+                                        $(grid).datagrid('reload');
+                                    }
+
+                                },
+                                error: function (msg) {
+                                    $.messager.alert('消息提示','添加失败','error');
+                                }//添加失败之后调用
+                            });
+                        }
+                    };
+                    //删除的json处理
+                    $.postJSON3 = function(url,dlg,grid) {
+                        return jQuery.ajax({
+                            'type' : 'DELETE',
+                            'url' : url,
+                            success: function (msg) {
+                                $.messager.alert('消息提示','删除成功','info');
+                                $(dlg).dialog('close');
+                                $(grid).datagrid('reload');
+                            },
+                            error:function (msg) {
+                                $.messager.alert('消息提示','删除失败','error');
+
+                            }
+                        });
+                    };
+
+                    //显示执业资格
+                    $(function () {
+                        $('#qualification').datagrid({
+                            toolbar: '#qualificationtoolbar',
+                            method: 'get',
+                            width: 730,
+                            height: 390,
+                            singleSelect: true,
+                            rowNumbers: "true",//显示行号
+                            remoteSort: false,//对本地数据进行排序
+                            fitColumns: true,//自适应表格大小
+                            frozenColumns: [[{field: "chk", "checkbox": true}]],//单选框
+                            columns: [[
+                                {field: 'id', title: 'id', hidden: true},
+                                {
+                                    field: 'practisingCertification',
+                                    formatter: function (value, rec) {
+                                        if (rec.practisingCertification == null) {
+                                            return '未选择';
+                                        }
+                                        else {
+                                            return rec.practisingCertification.description;
+                                        }
+                                    }, title: '证书名称', width: 100, align: 'center'
+                                },
+                                {field: 'registerNo', title: '注册编号', width: 150, align: 'center'},
+                                {field: 'certificateNo', title: '证书编号', width: 150, align: 'center'},
+                                {field: 'servedOrganization', title: '聘用企业', width: 150, align: 'center'},
+                                {field: 'issuedDate', title: '获得时间', width: 100, align: 'center',sortable: true,},
+                                {
+                                    field: 'issuer',
+                                    formatter: function (value, rec) {
+                                        if (rec.issuer == null) {
+                                            return '未选择';
+                                        }
+                                        else {
+                                            return rec.issuer.description;
+                                        }
+                                    }, title: '发证机构', width: 100, align: 'center'
+                                },
+                                {
+                                    field: 'photo',
+                                    formatter: function (value, row, index) {
+                                        if (row.photo) {
+                                            var imgsrc = basePath() + '/toLookQuaImge?imgId=' + row.id + '&;nowTime?' + new Date().getTime();
+                                            return '<a href="#" onclick="showBigImg(&apos;' + row.id + '&apos;)"><img width="50px" height="50px" style="border:1px"  src="' + imgsrc + '" alt="无图片" title="点击查看大图"/></a>';
+                                        }
+                                        if (row.photo == null) {
+                                            return '<img width="50px" height="50px" style="border:1px"  src="" alt="无图片"/>';
+                                        }
+                                        if (row.photo == "") {
+                                            return '<img width="50px" height="50px" style="border:1px"  src="" alt="无图片"/>';
+                                        }
+                                    }, title: '照片', width: 100, align: 'center'
+                                },
+                            ]],
+                            pagination: "true",//分页
+                        });
+                        //分页用的获取datagrid中的详细内容，后台只需要获取easyui自动提供pages和rows（我好像需要一个rows）即可。
+                        var p = $('#qualification').datagrid('getPager');
+                        $(p).pagination({
+                            showPageList: false,
+                            beforePageText: '第',//页数文本框前显示的汉字
+                            afterPageText: '页    共 {pages} 页',
+                            displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+                            onBeforefresh: function () {
+                                $(this).pagination('loading');
+                                alert('before refresh');
+                                $(this).pagination('loaded');
+                            }
+                        });
+                    });
+                </script>
+                <table id="qualification" class="easyui-datagrid">
+                    <!--添加icon-->
+                    <div id="qualificationtoolbar" style="padding:5px;height:auto">
+                        <div style="margin-bottom:5px">
+                            <a id="PractisingCertification_add_linkbutton" href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+                               onclick="qualificationaddRecord()">添加</a>
+                            <a id="PractisingCertification_edit_linkbutton" href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
+                               onclick="qualificationeditRecord()">编辑</a>
+                            <a id="PractisingCertification_remove_linkbutton" href="#" class="easyui-linkbutton" iconCls="icon-cut" plain="true"
+                               onclick="qualificationremoveRecord()">删除</a>
+                        </div>
+                    </div>
+                </table>
+            </div>
+            <div title="奖励记录">
+                <table id="reward" class="easyui-datagrid"></table>
+            </div>
+            <div title="校内工作经历">
+                <table id="schoolworkExperience" class="easyui-datagrid"></table>
+            </div>
+            <div id="EmployeeAssPost" title="职位变更">
+                <table id="employmentPost" ></table>
+            </div>
+            <div title="学术会议">
+                <table id="academicConference" class="easyui-datagrid"></table>
+            </div>
+            <div title="国内外访学记录">
+                <table id="visitingStudy" class="easyui-datagrid"></table>
+            </div>
+            <div id="PreviousWorkExperience" title="来校前工作经历">
+                <table id="previousExperiences"></table>
+            </div>
+        </div>
+    </div>
+</div>
+<!--弹出框-->
+<div id="qualificationdlg" class="easyui-dialog" th:scrolling="yes" style="width:400px;height:280px;padding:10px 20px;"
+     closed="true" buttons="#qualificationdlg-buttons">
+    <form id="qualificationfm" method="post">
+        <div class="fitem">
+            <input id="PractisingCertification_id_validatebox" name="id" class="easyui-validatebox" hidden="true"/>
+        </div>
+        <div id="PractisingCertification_name_div" class="fitem">
+            <label>
+                证书名称
+            </label>
+            <input id="PractisingCertification_name_validatebox" name="practisingCertification" class="easyui-combobox"
+                   data-options="
+                            required:true,
+                            method:'get',
+                            mode:'remote',
+                            url:basePath()+'/findAllQualificationName',
+                            valueField:'id',
+                            textField:'description',
+                            editable:false,
+                    "
+            />
+        </div>
+        <div id="PractisingCertification_registerNo_div" class="fitem">
+            <label>
+                注册编号
+            </label>
+            <input id="PractisingCertification_registerNo_validatebox" name="registerNo" class="easyui-validatebox"
+                   data-options="
+                          required:'true',
+                          missingMessage:'该字段不能为空',
+                    "
+            />
+        </div>
+        <div id="PractisingCertification_certificateNo_div" class="fitem">
+            <label>
+                证书编号
+            </label>
+            <input id="PractisingCertification_certificateNo_validatebox" name="certificateNo" class="easyui-validatebox"
+                   data-options="
+                          required:'true',
+                          missingMessage:'该字段不能为空',
+                    "
+            />
+        </div>
+        <div id="PractisingCertification_servedOrganization_div" class="fitem">
+            <label>
+                聘用企业1
+            </label>
+            <input id="PractisingCertification_servedOrganization_validatebox" name="servedOrganization" class="easyui-validatebox"
+                   data-options="
+                          required:'true',
+                          missingMessage:'该字段不能为空',
+                    "
+            />
+        </div>
+        <div id="PractisingCertification_issuedDate_div" class="fitem">
+            <label>
+                获得时间
+            </label>
+            <input id="PractisingCertification_issuedDate_validatebox" name="issuedDate" class="easyui-datebox" required="true" data-options="editable:false"/>
+        </div>
+        <div id="PractisingCertification_issuer_div" class="fitem">
+            <label>
+                发证机关
+            </label>
+            <input id="PractisingCertification_issuer_validatebox" name="issuer" class="easyui-combobox"
+                   data-options="
+                            required:true,
+                            method:'get',
+                            mode:'remote',
+                            url:basePath()+'/findAllCertificateOrganization',
+                            valueField:'id',
+                            textField:'description',
+                            editable:false,
+                    "
+            />
+        </div>
+        <div class="fitem">
+            <input id="PractisingCertification_employee_validatebox" name="employee" class="easyui-validatebox" hidden="true"/>
+        </div>
+        <div class="fitem">
+            <input id="PractisingCertification_image_validatebox" name="image" class="easyui-validatebox" hidden="true"/>
+        </div>
+    </form>
+    <div class="file">
+        <form id="quaFile" enctype="multipart/form-data">
+            <div class="fitem">
+                点击此处选择文件<input type="file" id="quaFileId" name="quaImgName"/>
+            </div>
+        </form>
+    </div>
+    <script>
+        //选择图片进行操作
+        function change_quaFile() {
+            var row = $('#staff').datagrid("getSelected");
+            if (row) {
+                fileSubmit('#quaFile', basePath() + '/uploadQuaImg?quaId=' + row.id);
+            }
+            if (row == null) {
+                fileSubmit('#quaFile', basePath() + '/uploadQuaImg?quaId=' + 0);
+            }
+        }
+        //触动上传文件，就进行上传
+        $('#quaFileId').on("change", function () {
+            var fileInput = $('#quaFileId')[0];
+            if ((Math.ceil(fileInput.files[0].size / 1024)) >= 1024) {
+                $.messager.alert('消息提示', '文件大小必须限制在1M以内', 'error');
+            } else {
+                change_quaFile();
+            }
+        });
+        //查看大图
+        function showBigImg(rowId) {
+            $("#bigImgdlg").dialog("open").dialog('setTitle', '照片');
+            //绑定数据源，本身属性可以自动绑定，外键属性必须手动绑定id
+            $("#bigImgfm").form("load");
+            var img = document.getElementById('bigImg');
+            img.src = basePath() + '/toLookQuaImge?imgId=' + rowId + '&;nowTime?' + new Date().getTime();
+        }
+
+    </script>
+</div>
+<div id="qualificationdlg-buttons">
+    <a id="PractisingCertification_save_linkbutton" href="#" class="easyui-linkbutton" onclick="qualificationsaveRecord()" iconcls="icon-save">保存</a>
+    <a id="PractisingCertification_cancel_linkbutton" href="#" class="easyui-linkbutton" onclick="javascript:$('#qualificationdlg').dialog('close')"
+       iconcls="icon-cancel">取消</a>
+
+</div>
+<!--js-->
+<script type="text/javascript" th:src="@{/jsFile/rsxx.js}"></script>
+</body>
+</html>

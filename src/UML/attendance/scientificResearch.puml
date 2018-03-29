@@ -1,0 +1,102 @@
+@startuml
+abstract class ScientificResearch{
+    Long id
+    String seating
+    String numOfParticipants
+    Employee employee
+    ScienReasCheckingStatus status
+}
+ScientificResearch --> Employee
+ScientificResearch --> ScienReasCheckingStatus
+class ScienReasCheckingStatus{
+    Long id
+    String s
+}
+abstract class Project{
+      String name
+      String no
+      String resource
+      String leader
+      String sponsor
+      Calendar startTime
+      Calendar endTime
+      Double expenditure;//经费
+}
+abstract class PublishedBook{
+     String name
+     String press
+     Calendar publicationTime
+     String isbn
+     int words
+}
+class Awards{
+    AwardLevel awardLevel
+    String title
+    String author
+    String name
+    AwardsRank awardsRank
+    String sponsor
+    Calendar dateOfAward
+}
+Awards --> AwardLevel
+Awards --> AwardsRank
+class Thesis{
+     String title
+     String name
+     JournalRank journalRank
+     String year
+     Integer issue
+     Integer volume
+     Integer startingPageNo
+     Integer endingPageNo
+     Citation citation
+}
+Thesis --> JournalRank
+Thesis --> Citation
+class AbstractCategory{
+    Long id
+    String no
+    String description
+}
+AbstractCategory <|-- Citation
+AbstractCategory <|-- AwardLevel
+class Monograph{
+    String author;
+    MonographRank monographRank
+}
+Monograph --> MonographRank
+class TextBook{
+     String editor;
+     TextbookRank textbookRank
+}
+TextBook --> TextbookRank
+class ProjectFundedByGovernment{
+    ProjectFundedByGovernmentRank projectFundedByGovernmentRank
+}
+ProjectFundedByGovernment --> ProjectFundedByGovernmentRank
+class ProjectFundedByPrivateSector{
+    ProjectFundedByPrivateSectorRank projectFundedByPrivateSectorRank
+}
+ProjectFundedByPrivateSector --> ProjectFundedByPrivateSectorRank
+
+ScientificResearch <|-- Thesis
+ScientificResearch <|-- Awards
+ScientificResearch <|-- PublishedBook
+ScientificResearch <|-- Project
+PublishedBook <|-- Monograph
+PublishedBook <|-- TextBook
+Project <|-- ProjectFundedByGovernment
+Project <|-- ProjectFundedByPrivateSector
+
+abstract class Rank{
+    Long id
+    String no
+    String description
+}
+Rank <|-- TextbookRank
+Rank <|-- MonographRank
+Rank <|-- ProjectFundedByGovernmentRank
+Rank <|-- ProjectFundedByPrivateSectorRank
+Rank <|-- AwardsRank
+Rank <|-- JournalRank
+@enduml
